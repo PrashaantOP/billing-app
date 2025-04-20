@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Boxes, CopyPlus, DollarSign, FilePlus, Folder, Gem, LayoutGrid, PackageCheck, ReceiptText, SquarePlus, Store, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -12,6 +12,56 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: '/dashboard',
         icon: LayoutGrid,
+    },
+    {
+        title: 'New Bill',
+        href: '/newbill',
+        icon: FilePlus,
+    },
+    {
+        title: 'Categories',
+        href: '/categories',
+        icon: CopyPlus,
+    },
+    {
+        title: 'Products',
+        href: '/products',
+        icon: SquarePlus,
+    },
+    {
+        title: 'Stores',
+        href: '/stores',
+        icon: Store,
+    },
+    {
+        title: 'Customers',
+        href: '/customers',
+        icon: Users,
+    },
+    {
+        title: 'Invoices',
+        href: '/invoices',
+        icon: ReceiptText,
+    },
+    {
+        title: 'Payments',
+        href: '/payments',
+        icon: DollarSign,
+    },
+    {
+        title: 'Stock Management',
+        href: '/stock',
+        icon: Boxes,
+    },
+    {
+        title: 'Orders',
+        href: '/orders',
+        icon: PackageCheck,
+    },
+    {
+        title: 'Plans',
+        href: '/plans',
+        icon: Gem,
     },
 ];
 
@@ -48,7 +98,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                {/* <NavFooter items={footerNavItems} className="mt-auto" /> */}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

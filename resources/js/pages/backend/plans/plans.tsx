@@ -3,19 +3,19 @@ import { CheckIcon } from '@heroicons/react/20/solid'
 
 const tiers = [
   {
-    name: 'Hobby',
+    name: 'Free',
     id: 'tier-hobby',
     href: '#',
-    priceMonthly: '$29',
+    priceMonthly: '₹0',
     description: "The perfect plan if you're just getting started with our product.",
     features: ['25 products', 'Up to 10,000 subscribers', 'Advanced analytics', '24-hour support response time'],
     featured: false,
   },
   {
-    name: 'Enterprise',
+    name: 'Primium',
     id: 'tier-enterprise',
     href: '#',
-    priceMonthly: '$99',
+    priceMonthly: '₹249',
     description: 'Dedicated support and infrastructure for your company.',
     features: [
       'Unlimited products',

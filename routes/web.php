@@ -17,9 +17,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //     return Inertia::render('backend/plans/plans');
     // })->name('plans');
 
-        Route::get('plans', [PlansController::class, 'viewPlans'])
-            ->name('plans');
+    Route::get('plans', [PlansController::class, 'viewPlans'])
+        ->name('plans');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/newbill.php';
+require __DIR__ . '/auth.php';

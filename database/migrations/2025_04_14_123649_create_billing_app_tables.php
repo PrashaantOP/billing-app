@@ -68,26 +68,27 @@ return new class extends Migration
         });
 
         // Categories Table
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('store_id');
-            $table->string('name');
-            $table->timestamps();
+        // Schema::create('categories', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->unsignedBigInteger('store_id');
+        //     $table->string('name');
+        //     $table->string('slug')->unique();
+        //     $table->timestamps();
 
-            $table->foreign('store_id')->references('id')->on('stores');
-        });
+        //     $table->foreign('store_id')->references('id')->on('stores');
+        // });
 
         // Products Table
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('category_id')->nullable();
+            // $table->unsignedBigInteger('category_id')->nullable();
             $table->unsignedBigInteger('store_id');
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('unit')->default('pcs');
             $table->timestamps();
 
-            $table->foreign('category_id')->references('id')->on('categories');
+            // $table->foreign('category_id')->references('id')->on('categories');
             $table->foreign('store_id')->references('id')->on('stores');
         });
 
@@ -265,6 +266,5 @@ return new class extends Migration
         Schema::dropIfExists('stores');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
-
     }
 };

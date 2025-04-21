@@ -19,7 +19,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'store_id', 'name', 'email', 'mobile', 'otp', 'otp_expires_at',
-        'password', 'role'
+        'password', 'role', 'image'
     ];
 
     /**

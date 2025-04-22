@@ -98,6 +98,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
+            $table->enum('food_type', ['veg', 'non veg'])->default('non veg');
             $table->boolean('is_available')->default(true);
             $table->timestamps();
 

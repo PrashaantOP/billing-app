@@ -8,28 +8,7 @@ import { Link } from '@inertiajs/react';
 import { Search } from 'lucide-react';
 import { useState, type PropsWithChildren } from 'react';
 
-// const sidebarNavItems: NavItem[] = [
-//     {
-//         title: 'All Categories',
-//         href: '/newbill/create-new-bill',
-//         icon: null,
-//     },
-//     {
-//         title: 'Cat 2',
-//         href: '/settings/store',
-//         icon: null,
-//     },
-//     {
-//         title: 'Cat 3',
-//         href: '/settings/password',
-//         icon: null,
-//     },
-//     {
-//         title: 'Cat 4',
-//         href: '/settings/appearance',
-//         icon: null,
-//     },
-// ];
+
 
 interface NewBillLayoutProps extends PropsWithChildren {
     categories: {
@@ -48,7 +27,7 @@ export default function NewBillLayout({ children, categories }: NewBillLayoutPro
 
     const currentPath = window.location.pathname;
 
-    
+
 
     return (
         <div className="px-4 py-6">

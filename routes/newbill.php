@@ -4,10 +4,24 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NewBill\CreateNewBillController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Category;
+
 
 Route::middleware('auth')->group(function () {
-    Route::redirect('newbill', 'newbill/create-new-bill');
-    Route::get('newbill/create-new-bill', [CreateNewBillController::class, 'newBillShow'])->name('newbill.create-new-bill');
+
+    Route::get('newbill', function () {
+        $restaurant = Auth::user()->restaurant;
+        $singleCategory = Category::where('restaurant_id', $restaurant->id)->first();
+
+        if ($singleCategory) {
+            return redirect('newbill/menu/' . $singleCategory->slug);
+        } else {
+            return redirect('/dashboard');
+        }
+    });
+    // Route::redirect('newbill/menu', 'newbill/menu/{$singleCategory->slug}');
+    // Route::get('newbill/menu', [CreateNewBillController::class, 'newBillShow'])->name('newbill.create-new-bill');
     Route::get('newbill/menu/{category}', [CreateNewBillController::class, 'getItemUsingSlug'])->name('newbill.items.show');
 
     // Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');

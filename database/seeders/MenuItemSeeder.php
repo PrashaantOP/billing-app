@@ -21,6 +21,7 @@ class MenuItemSeeder extends Seeder
                 'name' => 'Spring Rolls',
                 'description' => 'Crispy rolls with veggies and sweet chili sauce',
                 'price' => 5.99,
+                'food_type' => 'veg',
                 'is_available' => true,
             ],
             [
@@ -29,6 +30,7 @@ class MenuItemSeeder extends Seeder
                 'name' => 'Grilled Chicken',
                 'description' => 'Juicy grilled chicken served with garlic rice',
                 'price' => 12.49,
+                'food_type' => 'non veg',
                 'is_available' => true,
             ],
             [
@@ -37,6 +39,7 @@ class MenuItemSeeder extends Seeder
                 'name' => 'Mango Smoothie',
                 'description' => 'Fresh mango blended with ice and yogurt',
                 'price' => 4.50,
+                'food_type' => 'veg',
                 'is_available' => true,
             ],
             [
@@ -45,15 +48,8 @@ class MenuItemSeeder extends Seeder
                 'name' => 'Bruschetta',
                 'description' => 'Toasted bread with tomatoes and basil',
                 'price' => 6.75,
+                'food_type' => 'veg',
                 'is_available' => true,
-            ],
-            [
-                'restaurant_id' => 1,
-                'category_id' => 6,
-                'name' => 'Beef Stroganoff',
-                'description' => 'Beef strips cooked in creamy mushroom sauce',
-                'price' => 14.25,
-                'is_available' => false,
             ],
             [
                 'restaurant_id' => 1,
@@ -61,6 +57,7 @@ class MenuItemSeeder extends Seeder
                 'name' => 'Pancake Stack',
                 'description' => 'Fluffy pancakes with maple syrup and butter',
                 'price' => 7.80,
+                'food_type' => 'veg',
                 'is_available' => true,
             ],
         ];

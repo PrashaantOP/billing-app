@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Boxes, CopyPlus, DollarSign, FilePlus, Folder, Gem, LayoutGrid, PackageCheck, ReceiptText, SquarePlus, Store, Users } from 'lucide-react';
+import { BookOpen,  CopyPlus, DollarSign, FilePlus, Folder, Gem, History, LayoutGrid, PackageCheck, Percent, ReceiptText, SquarePlus, Store, Table, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -14,24 +14,19 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'New Bill',
+        title: 'New Order',
         href: '/newbill',
         icon: FilePlus,
     },
     {
-        title: 'Categories',
-        href: '/categories',
-        icon: CopyPlus,
+        title: 'Orders',
+        href: '/orders',
+        icon: PackageCheck,
     },
     {
-        title: 'Products',
-        href: '/products',
-        icon: SquarePlus,
-    },
-    {
-        title: 'Stores',
-        href: '/stores',
-        icon: Store,
+        title: 'Dining Tables',
+        href: '/dining-tables',
+        icon: Table,
     },
     {
         title: 'Customers',
@@ -39,9 +34,14 @@ const mainNavItems: NavItem[] = [
         icon: Users,
     },
     {
-        title: 'Invoices',
-        href: '/invoices',
-        icon: ReceiptText,
+        title: 'Menu Categories',
+        href: '/categories',
+        icon: CopyPlus,
+    },
+    {
+        title: 'Menu Items',
+        href: '/menu-items',
+        icon: SquarePlus,
     },
     {
         title: 'Payments',
@@ -49,14 +49,19 @@ const mainNavItems: NavItem[] = [
         icon: DollarSign,
     },
     {
-        title: 'Stock Management',
-        href: '/stock',
-        icon: Boxes,
+        title: 'Taxes',
+        href: '/taxes',
+        icon: Percent,
     },
     {
-        title: 'Orders',
-        href: '/orders',
-        icon: PackageCheck,
+        title: 'Logs',
+        href: '/logs',
+        icon: History,
+    },
+    {
+        title: 'Restaurant Settings',
+        href: '/restaurant',
+        icon: Store,
     },
     {
         title: 'Plans',

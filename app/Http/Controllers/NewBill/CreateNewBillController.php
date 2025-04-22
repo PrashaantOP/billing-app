@@ -4,6 +4,7 @@ namespace App\Http\Controllers\NewBill;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\MenuItem;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -13,11 +14,51 @@ class CreateNewBillController extends Controller
 {
     public function newBillShow()
     {
-        $store = Auth::user()->store;
-        $categories = Product::where('store_id', $store->id)->get();
+        $restaurant = Auth::user()->restaurant;
+        $categories = category::where('restaurant_id', $restaurant->id)->get();
+        $singleCategory = category::where('restaurant_id', $restaurant->id)->first();
+        if (!$singleCategory) {
+            return response()->json(['message' => 'Category not found'], 404);
+        }
+
+        $menuItems = MenuItem::where('category_id', $singleCategory->id)
+            // ->with(['restaurant', 'category'])
+            ->get();
+        return Inertia::render('backend/newbill/createNewBill', [
+            'categories' => $categories,
+            'menuitems' => $menuItems,
+            'categoryname' => $singleCategory->name,
+        ]);
+    }
+
+    public function getItemUsingSlug($slug)
+    {
+        $restaurant = Auth::user()->restaurant;
+        $categories = category::where('restaurant_id', $restaurant->id)->get();
+        $singleCategory = Category::where('slug', $slug)->where('restaurant_id', $restaurant->id)->first();
+
+        if (!$singleCategory) {
+            return response()->json(['message' => 'Category not found'], 404);
+        }
+
+        $menuItems = MenuItem::where('category_id', $singleCategory->id)
+            // ->with(['restaurant', 'category'])
+            ->get();
 
         return Inertia::render('backend/newbill/createNewBill', [
             'categories' => $categories,
+            'menuitems' => $menuItems,
+            'categoryname' => $singleCategory->name,
         ]);
     }
+    // {
+    //     $restaurant = Auth::user()->restaurant;
+    //     $categories = category::where('restaurant_id', $restaurant->id)->with('menuItems')->get();
+    //     // $categories = MenuItem::where('restaurant_id', $restaurant->id)->get();
+    //     dd($categories);
+
+    //     return Inertia::render('backend/newbill/createNewBill', [
+    //         'categories' => $categories,
+    //     ]);
+    // }
 }

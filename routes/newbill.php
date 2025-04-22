@@ -8,7 +8,7 @@ use Inertia\Inertia;
 Route::middleware('auth')->group(function () {
     Route::redirect('newbill', 'newbill/create-new-bill');
     Route::get('newbill/create-new-bill', [CreateNewBillController::class, 'newBillShow'])->name('newbill.create-new-bill');
-    Route::get('newbill/category/{category}', [CreateNewBillController::class, 'getCategoryUsingSlug'])->name('newbill.category.show');
+    Route::get('newbill/menu/{category}', [CreateNewBillController::class, 'getItemUsingSlug'])->name('newbill.items.show');
 
     // Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     // Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');

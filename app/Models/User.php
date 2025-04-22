@@ -18,42 +18,31 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'store_id', 'name', 'email', 'mobile', 'otp', 'otp_expires_at',
-        'password', 'role', 'image'
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
+        'restaurant_id',
+        'name',
+        'image',
+        'email',
+        'mobile',
+        'otp',
+        'otp_expires_at',
         'password',
-        'remember_token',
+        'role'
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $hidden = ['password', 'remember_token'];
+
+    public function restaurant()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->belongsTo(Restaurant::class);
     }
 
-    public function store() {
-        return $this->belongsTo(Store::class);
-    }
-
-    public function invoices() {
-        return $this->hasMany(Invoice::class);
-    }
-
-    public function logs() {
+    public function logs()
+    {
         return $this->hasMany(Log::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 }

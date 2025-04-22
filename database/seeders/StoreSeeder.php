@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Restaurant;
 use App\Models\Store;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,7 +14,7 @@ class StoreSeeder extends Seeder
      */
     public function run(): void
     {
-        Store::create([
+        Restaurant::create([
             'name' => 'Your Store',
             'email' => 'pk1093524@gmail.com',
         ]);

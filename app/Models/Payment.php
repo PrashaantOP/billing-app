@@ -7,15 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
     protected $fillable = [
-        'store_id', 'invoice_id', 'payment_date',
-        'amount_paid', 'payment_method', 'transaction_reference', 'notes'
+        'restaurant_id',
+        'order_id',
+        'payment_date',
+        'amount_paid',
+        'payment_method',
+        'transaction_reference',
+        'notes'
     ];
 
-    public function store() {
-        return $this->belongsTo(Store::class);
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class);
     }
 
-    public function invoice() {
-        return $this->belongsTo(Invoice::class);
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
     }
 }

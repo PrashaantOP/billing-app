@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\Store;
 use Illuminate\Auth\Events\Registered;
@@ -33,17 +34,17 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $store = Store::create([
-            'name' => 'Your Store',
+        $restaurant = Restaurant::create([
+            'name' => 'Your Restaurant',
             'email' => $request->email,
         ]);
 
         $user = User::create([
-            'store_id' => $store->id,
+            'restaurant_id' => $restaurant->id,
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),

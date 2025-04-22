@@ -6,13 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Log extends Model
 {
-    protected $fillable = ['store_id', 'user_id', 'action', 'related_table', 'related_id', 'ip_address'];
+    protected $fillable = [
+        'restaurant_id',
+        'user_id',
+        'action',
+        'related_table',
+        'related_id',
+        'ip_address'
+    ];
 
-    public function store() {
-        return $this->belongsTo(Store::class);
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class);
     }
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 }

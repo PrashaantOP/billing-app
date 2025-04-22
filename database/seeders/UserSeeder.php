@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'store_id' => 1, // Make sure this store exists
+            'restaurant_id' => 1, // Make sure this store exists
             'name' => 'Prashant Kumar',
             'email' => 'pk1093524@gmail.com',
             'image' => '1683556099907.jpeg',

@@ -48,7 +48,7 @@ export default function NewBillLayout({ children, categories }: NewBillLayoutPro
             </div>
 
             {/* Filtered Categories */}
-            <nav className="flex flex-col space-y-1 space-x-0">
+            <nav className="flex flex-row lg:flex-col space-y-1 space-x-0 overflow-x-auto lg:overflow-x-hidden">
                 {categories
                 .filter((item) =>
                     item.name.toLowerCase().includes(searchTerm.toLowerCase())

@@ -6,7 +6,8 @@ import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
 // import SettingsLayout from '@/layouts/settings/layout';
 import NewBillLayout from '@/layouts/newBill/layout';
-import { Check, CircleCheck, Minus, Plus, ShoppingCart, X } from 'lucide-react';
+import { ArrowRight, Check, Minus, Plus, Printer, ShoppingBag, ShoppingCart, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -113,11 +114,13 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-    setCartOpen(true);
+    // setCartOpen(true);
     console.log('Selected items:', selectedItems);
 }, [selectedItems]);
 
 const total = selectedItems.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0);
+const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
+
 
 
 
@@ -128,7 +131,7 @@ const total = selectedItems.reduce((sum, i) => sum + i.price * (i.quantity || 1)
             <Head title="Create new order" />
 
             <NewBillLayout categories={categories}>
-                <div className="flex flex-row">
+                <div className="flex flex-row items-center justify-start gap-2 ">
                 <div className="space-y-6">
                     <HeadingSmall title={categoryname} description="Create new order and print" />
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -178,28 +181,31 @@ const total = selectedItems.reduce((sum, i) => sum + i.price * (i.quantity || 1)
 
                 {/* side bar start  */}
 
-                <div className={`fixed lg:relative w-full sm:w-96 lg:max-w-xl lg:w-80 lg:rounded-md bg-white shadow-lg z-50 transform transition-transform duration-300  ${cartOpen ? 'translate-x-0 block  top-0 left-0 h-full' : 'translate-x-full hidden'}`}>
+                <div className={`fixed w-full top-2 bottom-2 right-0 lg:right-3 sm:w-96 lg:max-w-xl lg:w-100 lg:rounded-md bg-white shadow-lg z-50 transform transition-transform duration-300 h-full  ${cartOpen ? 'translate-x-0 block ' : 'translate-x-full hidden'}`}>
                         <div className="flex justify-between items-center p-4 border-b">
-                        <h2 className="text-xl font-bold">🛒 Cart</h2>
-                        <button onClick={() => setCartOpen(false)}><X className="w-5 h-5" /></button>
+                        <h2 className="text-xl font-bold flex flex-row items-center justify-start gap-2"> Cart</h2>
+                        <button onClick={() => setCartOpen(false)}><X className="w-5 h-5 cursor-pointer" /></button>
                         </div>
 
                         <div className="p-4 overflow-y-auto h-[calc(100%-100px)]">
                         {selectedItems.length > 0 ? (
                             <ul className="space-y-3">
                             {selectedItems.map((item) => (
-                                <li key={item.id} className="flex justify-between items-center p-3 bg-gray-100 rounded">
-                                <div>
+                                <li key={item.id} className="flex justify-between items-center p-3 bg-green-600/10 rounded">
+                                    <div className="flex flex-row items-start gap-3">
+                                        <img src={`/assets/images/menuitems/${item.image || "food-default.png"}`} className='w-15 h-15 bg-white rounded object-cover' alt="" />
+                                    <div>
                                     <p className="font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">{item.name}</p>
-                                    <div className="flex items-center mt-1 space-x-2">
-                                    <button onClick={() => decreaseQty(item.id)}><Minus className="w-4 h-4" /></button>
-                                    <span>{item.quantity}</span>
-                                    <button onClick={() => increaseQty(item.id)}><Plus className="w-4 h-4" /></button>
-                                    </div>
                                 </div>
+                                    </div>
+                                    
                                 <div className="text-right">
-                                    <p>₹{item.price * (item.quantity || 1)}</p>
-                                    <button onClick={() => removeItem(item.id)} className="text-red-500 text-sm">Remove</button>
+                                    <div className="flex flex-row items-center justify-center gap-3 text-white rounded-lg w-fit py-1 px-2 mt-1 bg-green-600">
+                                        <button className='cursor-pointer' onClick={() => decreaseQty(item.id)}><Minus className="w-4 h-4" /></button>
+                                        <span>{item.quantity}</span>
+                                        <button className='cursor-pointer' onClick={() => increaseQty(item.id)}><Plus className="w-4 h-4" /></button>
+                                    </div>
+                                    <p className='text-sm'>₹{item.price * (item.quantity || 1)}</p>
                                 </div>
                                 </li>
                             ))}
@@ -215,13 +221,152 @@ const total = selectedItems.reduce((sum, i) => sum + i.price * (i.quantity || 1)
                     </div>
 
                     {/* Floating Cart Toggle Button (Mobile-friendly) */}
-      <button
-        onClick={() => setCartOpen(true)}
-        className="fixed bottom-4 right-4 bg-black text-white rounded-full p-3 shadow-lg flex items-center gap-2 hover:bg-gray-800 transition md:hidden"
-      >
-        <ShoppingCart className="w-5 h-5" />
-        <span className="text-sm">{selectedItems.length}</span>
-      </button>
+                    <div className="fixed bottom-4 right-0 z-50 flex items-center justify-center lg:justify-end px-0 lg:px-10 gap-3 w-full">
+                            <AnimatePresence>
+                            {selectedItems.length > 0 && !cartOpen && (
+                                <motion.div
+                                            initial={{ opacity: 0, scale: 0.5 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.5 }}
+                                            transition={{ duration: 0.4, ease: "easeOut" }}
+                                            className=" bg-green-600 text-white rounded-full px-1 py-1 shadow-xl flex items-center space-x-3  cursor-pointer"
+                                            onClick={() => setCartOpen(true)}
+                                            >
+                                                <motion.div
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    transition={{ delay: 0.2, duration: 0.3 }}
+                                                    className="flex items-center -space-x-4"
+                                                >
+                                                    {selectedItems.slice(0, 3).map((item, index) => (
+                                                    <img
+                                                        key={index}
+                                                        src={`/assets/images/menuitems/${item.image || "food-default.png"}`}
+                                                        alt={item.name}
+                                                        className="w-10 h-10 rounded-full border-2 border-green-600 object-cover"
+                                                    />
+                                                    ))}
+                                                </motion.div>
+                                <motion.div
+                                    initial={{ opacity: 0, x: 10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                    className="flex flex-col justify-center"
+                                >
+                                    <span className="text-xs font-semibold">View cart</span>
+                                    <span className="text-xs">{totalItem} {totalItem > 1 ? " Items" : " Item"}</span>
+                                </motion.div>
+                                    <motion.div
+                                        initial={{ opacity: 0, rotate: -90 }}
+                                        animate={{ opacity: 1, rotate: 0 }}
+                                        transition={{ delay: 0.4 }}
+                                        className="bg-black/10 rounded-full p-2"
+                                    >
+                                        <ShoppingCart className="w-5 h-5" />
+                                    </motion.div>
+                            </motion.div>
+                            )}
+                        </AnimatePresence>
+                        <AnimatePresence>
+                            {selectedItems.length > 0 && cartOpen && (
+                                <motion.div
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.5 }}
+                                transition={{ duration: 0.4, ease: "easeOut" }}
+                                className=" bg-green-600 text-white rounded-full px-1 py-1 shadow-xl flex items-center space-x-1  cursor-pointer"
+                                >
+                                {/* Initial single image pop-in */}
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ delay: 0.2, duration: 0.3 }}
+                                    className="flex items-center -space-x-4"
+                                >
+                                    {selectedItems.slice(0, 3).map((item, index) => (
+                                    <img
+                                        key={index}
+                                        src={`/assets/images/menuitems/${item.image || "food-default.png"}`}
+                                        alt={item.name}
+                                        className="w-10 h-10 rounded-full border-2 border-green-600 object-cover"
+                                    />
+                                    ))}
+                                </motion.div>
+
+                                {/* Info section */}
+                                <motion.div
+                                    initial={{ opacity: 0, x: 10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                    className="flex flex-col justify-center"
+                                >
+                                    <span className="text-xs font-semibold">KOT + Bill</span>
+                                    {/* <span className="text-xs">{totalItem} {totalItem > 1 ? " ITEMS" : " ITEM"}</span> */}
+                                </motion.div>
+
+                                {/* Arrow icon */}
+                                <motion.div
+                                    initial={{ opacity: 0, rotate: -90 }}
+                                    animate={{ opacity: 1, rotate: 0 }}
+                                    transition={{ delay: 0.4 }}
+                                    className="bg-black/10 rounded-full p-2"
+                                >
+                                    <Printer className="w-5 h-5" />
+                                </motion.div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                        <AnimatePresence>
+                            {selectedItems.length > 0 && cartOpen && (
+                                <motion.div
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.5 }}
+                                transition={{ duration: 0.4, ease: "easeOut" }}
+                                className=" bg-green-600 text-white rounded-full px-1 py-1 shadow-xl flex items-center space-x-1  cursor-pointer"
+                                >
+                     
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ delay: 0.2, duration: 0.3 }}
+                                    className="flex items-center -space-x-4"
+                                >
+                                    {selectedItems.slice(0, 3).map((item, index) => (
+                                    <img
+                                        key={index}
+                                        src={`/assets/images/menuitems/${item.image || "food-default.png"}`}
+                                        alt={item.name}
+                                        className="w-10 h-10 rounded-full border-2 border-green-600 object-cover"
+                                    />
+                                    ))}
+                                </motion.div>
+                                {/* Info section */}
+                                <motion.div
+                                    initial={{ opacity: 0, x: 10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                    className="flex flex-col justify-center"
+                                >
+                                    <span className="text-xs font-semibold">Bill</span>
+                                    {/* <span className="text-xs">{totalItem} {totalItem > 1 ? " ITEMS" : " ITEM"}</span> */}
+                                </motion.div>
+
+                                {/* Arrow icon */}
+                                <motion.div
+                                    initial={{ opacity: 0, rotate: -90 }}
+                                    animate={{ opacity: 1, rotate: 0 }}
+                                    transition={{ delay: 0.4 }}
+                                    className="bg-black/10 rounded-full p-2"
+                                >
+                                    <Printer className="w-5 h-5" />
+                                </motion.div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                    
+
 
 
                 {/* side bar end  */}

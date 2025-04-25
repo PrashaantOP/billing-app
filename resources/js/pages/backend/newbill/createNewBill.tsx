@@ -48,10 +48,15 @@ type CreateNewBillProps = {
 
     }[];
     categoryname: string;
+    taxes: {
+        id: number;
+        name: string;
+        rate: number;
+    }[];
 }
 
 
-export default function CreateNewBill({ categories, menuitems, categoryname }: CreateNewBillProps) {
+export default function CreateNewBill({ categories, menuitems, categoryname, taxes }: CreateNewBillProps) {
 
 
    // right side cart work starts here
@@ -121,6 +126,9 @@ useEffect(() => {
 const total = selectedItems.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0);
 const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
 
+// total with tax
+const totalTax = taxes.reduce((sum, tax) => sum + (total * tax.rate / 100), 0);
+const totalWithTax = total + totalTax;
 
 
 
@@ -181,7 +189,7 @@ const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
 
                 {/* side bar start  */}
 
-                <div className={`fixed w-full top-2 bottom-2 right-0 lg:right-3 sm:w-96 lg:max-w-xl lg:w-100 lg:rounded-md bg-white shadow-lg z-50 transform transition-transform duration-300 h-full  ${cartOpen ? 'translate-x-0 block ' : 'translate-x-full hidden'}`}>
+                <div className={`fixed w-full top-2 bottom-2 right-0 lg:right-3 sm:w-96 lg:max-w-xl lg:w-100 lg:rounded-md bg-white shadow-lg z-4 transform transition-transform duration-300 h-full  ${cartOpen ? 'translate-x-0 block ' : 'translate-x-full hidden'}`}>
                         <div className="flex justify-between items-center p-4 border-b">
                         <h2 className="text-xl font-bold flex flex-row items-center justify-start gap-2"> Cart</h2>
                         <button onClick={() => setCartOpen(false)}><X className="w-5 h-5 cursor-pointer" /></button>
@@ -198,7 +206,7 @@ const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
                                     <p className="font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">{item.name}</p>
                                 </div>
                                     </div>
-                                    
+
                                 <div className="text-right">
                                     <div className="flex flex-row items-center justify-center gap-3 text-white rounded-lg w-fit py-1 px-2 mt-1 bg-green-600">
                                         <button className='cursor-pointer' onClick={() => decreaseQty(item.id)}><Minus className="w-4 h-4" /></button>
@@ -209,9 +217,22 @@ const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
                                 </div>
                                 </li>
                             ))}
-                            <li className="pt-4 border-t font-bold flex justify-between">
-                                <span>Total</span>
-                                <span>₹{total}</span>
+                            {taxes.length > 0 ? (
+                        taxes.map((item) => (
+                            <li key={item.id} className="flex justify-between gap-4 items-center ">
+                                <div className="flex">
+                                    <span className='text-xs '>{item.name}</span>
+                                    <span className='text-xs '>({item.rate}%)</span>
+                                </div>
+                                <span className='text-xs text-semibold'><span className='text-green-600'>+</span> {total*item.rate/100}</span>
+                            </li>
+                        ))
+                            ) : (
+                                <div>No taxes available</div>
+                            )}
+                            <li className="pt-4 border-t font-bold flex justify-between gap-4 mb-15">
+                                <span>Total:</span>
+                                <span>₹{totalWithTax}</span>
                             </li>
                             </ul>
                         ) : (
@@ -221,7 +242,7 @@ const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
                     </div>
 
                     {/* Floating Cart Toggle Button (Mobile-friendly) */}
-                    <div className="fixed bottom-4 right-0 z-50 flex items-center justify-center lg:justify-end px-0 lg:px-10 gap-3 w-full">
+                    <div className="fixed bottom-4 right-0 z-5 flex items-center justify-center lg:justify-end px-0 lg:px-10 gap-3 w-full">
                             <AnimatePresence>
                             {selectedItems.length > 0 && !cartOpen && (
                                 <motion.div
@@ -325,7 +346,7 @@ const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
                                 transition={{ duration: 0.4, ease: "easeOut" }}
                                 className=" bg-green-600 text-white rounded-full px-1 py-1 shadow-xl flex items-center space-x-1  cursor-pointer"
                                 >
-                     
+
                                 <motion.div
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
@@ -365,7 +386,7 @@ const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
                             )}
                         </AnimatePresence>
                     </div>
-                    
+
 
 
 

@@ -19,10 +19,11 @@ class DatabaseSeeder extends Seeder
             StoreSeeder::class,
             UserSeeder::class,
             CategorySeeder::class,
+            MenuItemSeeder::class,
         ]);
 
         $this->call([
-            MenuItemSeeder::class,
+            TaxSeeder::class,
         ]);
     }
 }

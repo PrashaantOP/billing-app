@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\MenuItem;
 use App\Models\Product;
+use App\Models\Tax;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -35,6 +36,9 @@ class CreateNewBillController extends Controller
     {
         $restaurant = Auth::user()->restaurant;
         $categories = category::where('restaurant_id', $restaurant->id)->get();
+        $taxes = Tax::where('restaurant_id', $restaurant->id)
+            ->where('is_inclusive', true)
+            ->get();
         $singleCategory = Category::where('slug', $slug)->where('restaurant_id', $restaurant->id)->first();
 
         if (!$singleCategory) {
@@ -49,16 +53,7 @@ class CreateNewBillController extends Controller
             'categories' => $categories,
             'menuitems' => $menuItems,
             'categoryname' => $singleCategory->name,
+            'taxes' => $taxes,
         ]);
     }
-    // {
-    //     $restaurant = Auth::user()->restaurant;
-    //     $categories = category::where('restaurant_id', $restaurant->id)->with('menuItems')->get();
-    //     // $categories = MenuItem::where('restaurant_id', $restaurant->id)->get();
-    //     dd($categories);
-
-    //     return Inertia::render('backend/newbill/createNewBill', [
-    //         'categories' => $categories,
-    //     ]);
-    // }
 }

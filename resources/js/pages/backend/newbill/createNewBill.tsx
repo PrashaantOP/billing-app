@@ -6,7 +6,7 @@ import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
 // import SettingsLayout from '@/layouts/settings/layout';
 import NewBillLayout from '@/layouts/newBill/layout';
-import { ArrowRight, Check, Minus, Plus, Printer, ShoppingBag, ShoppingCart, X } from 'lucide-react';
+import {  Check, Minus, Plus, Printer,  ShoppingCart, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -48,10 +48,15 @@ type CreateNewBillProps = {
 
     }[];
     categoryname: string;
+    taxes: {
+        id: number;
+        name: string;
+        rate: number;
+    }[];
 }
 
 
-export default function CreateNewBill({ categories, menuitems, categoryname }: CreateNewBillProps) {
+export default function CreateNewBill({ categories, menuitems, categoryname, taxes }: CreateNewBillProps) {
 
 
    // right side cart work starts here

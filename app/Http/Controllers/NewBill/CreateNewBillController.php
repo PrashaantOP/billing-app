@@ -17,6 +17,10 @@ class CreateNewBillController extends Controller
     {
         $restaurant = Auth::user()->restaurant;
         $categories = category::where('restaurant_id', $restaurant->id)->get();
+
+        // taxes
+        $taxes = Tax::where('restaurant_id', $restaurant->id)->where('is_inclusive', 1)->get();
+
         $singleCategory = category::where('restaurant_id', $restaurant->id)->first();
         if (!$singleCategory) {
             return response()->json(['message' => 'Category not found'], 404);
@@ -28,6 +32,7 @@ class CreateNewBillController extends Controller
         return Inertia::render('backend/newbill/createNewBill', [
             'categories' => $categories,
             'menuitems' => $menuItems,
+            'taxes' => $taxes,
             'categoryname' => $singleCategory->name,
         ]);
     }
@@ -41,6 +46,9 @@ class CreateNewBillController extends Controller
             ->get();
         $singleCategory = Category::where('slug', $slug)->where('restaurant_id', $restaurant->id)->first();
 
+        // taxes
+        $taxes = Tax::where('restaurant_id', $restaurant->id)->where('is_inclusive', 1)->get();
+
         if (!$singleCategory) {
             return response()->json(['message' => 'Category not found'], 404);
         }
@@ -52,6 +60,7 @@ class CreateNewBillController extends Controller
         return Inertia::render('backend/newbill/createNewBill', [
             'categories' => $categories,
             'menuitems' => $menuItems,
+            'taxes' => $taxes,
             'categoryname' => $singleCategory->name,
             'taxes' => $taxes,
         ]);

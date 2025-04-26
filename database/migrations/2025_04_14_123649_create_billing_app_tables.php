@@ -96,6 +96,7 @@ return new class extends Migration
             $table->unsignedBigInteger('restaurant_id');
             $table->unsignedBigInteger('category_id')->nullable();
             $table->string('name');
+            $table->string('image')->nullable();
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->enum('food_type', ['veg', 'non veg'])->default('non veg');

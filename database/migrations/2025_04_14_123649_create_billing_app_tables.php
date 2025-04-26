@@ -121,6 +121,7 @@ return new class extends Migration
             $table->decimal('tax', 10, 2)->default(0);
             $table->decimal('discount', 10, 2)->default(0);
             $table->decimal('total', 10, 2)->default(0);
+            $table->enum('payment_status', ['pending', 'paid', 'partial'])->default('pending');
             $table->timestamps();
 
             $table->foreign('restaurant_id')->references('id')->on('restaurants');

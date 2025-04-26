@@ -17,7 +17,8 @@ class Order extends Model
         'subtotal',
         'tax',
         'discount',
-        'total'
+        'total',
+        'payment_status'
     ];
 
     public function restaurant()

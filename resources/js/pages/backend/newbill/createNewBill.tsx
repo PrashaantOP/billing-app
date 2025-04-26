@@ -6,7 +6,7 @@ import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
 // import SettingsLayout from '@/layouts/settings/layout';
 import NewBillLayout from '@/layouts/newBill/layout';
-import {  Check, Minus, Plus, Printer,  ShoppingCart, X } from 'lucide-react';
+import {  Check, HandCoins, Landmark, LucideBanknote, Minus, Plus, Printer,  ShoppingCart, Split, WalletCards, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -63,6 +63,15 @@ export default function CreateNewBill({ categories, menuitems, categoryname, tax
 
    const [cartOpen, setCartOpen] = useState(false);
 const [selectedItems, setSelectedItems] = useState<MenuItemType[]>([]);
+
+// payment status 
+const [paymentStatus, setPaymentStatus] = useState('');
+const [paymentMethod, setPaymentMethod] = useState('');
+const [transactionId, setTransactionId] = useState('');
+const [partialAmount, setPartialAmount] = useState('');
+const [customerName, setCustomerName] = useState('');
+const [customerPhone, setCustomerPhone] = useState('');
+const [customerAddress, setCustomerAddress] = useState('');
 
 
 
@@ -234,6 +243,115 @@ const totalWithTax = total + totalTax;
                                 <span>Total:</span>
                                 <span>₹{totalWithTax}</span>
                             </li>
+
+                            {/* Payment Status Selection */}
+                            <li className='text-black font-bold'>Payment Details</li>
+    <li className="flex flex-wrap gap-2 pt-2">
+      <button
+        onClick={() => { setPaymentStatus('paid'); setPaymentMethod(''); setTransactionId(''); }}
+        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'paid' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-banknote-arrow-up-icon lucide-banknote-arrow-up"><path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="M18 12h.01"/><path d="M19 22v-6"/><path d="m22 19-3-3-3 3"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>Paid
+      </button>
+      <button
+        onClick={() => { setPaymentStatus('pending'); setPaymentMethod(''); setTransactionId(''); }}
+        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
+      ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-banknote-x-icon lucide-banknote-x"><path d="M13 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="m17 17 5 5"/><path d="M18 12h.01"/><path d="m22 17-5 5"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>
+        Pending
+      </button>
+      <button
+        onClick={() => { setPaymentStatus('partial'); setPaymentMethod(''); setTransactionId(''); }}
+        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'partial' ? 'bg-orange-500 text-white' : 'bg-gray-200'}`}
+      ><Split className="w-4 h-4" />
+        Partial
+      </button>
+    </li>
+
+    {/* Payment Method if Paid or Partial */}
+    {(paymentStatus === 'paid' || paymentStatus === 'partial') && (
+      <li className="flex flex-wrap gap-2 pt-2">
+        <button
+          onClick={() => setPaymentMethod('cash')}
+          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'cash' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+        >
+          <HandCoins className='w-4 h-4'/> Cash
+        </button>
+        <button
+          onClick={() => setPaymentMethod('bank')}
+          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'bank' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+        ><Landmark className='w-4 h-4'/>
+          Bank/UPI
+        </button>
+        <button
+          onClick={() => setPaymentMethod('cheque')}
+          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'cheque' ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}
+        ><WalletCards className='w-4 h-4'/>
+          Cheque
+        </button>
+      </li>
+    )}
+
+    {/* Transaction ID Input if Bank or Cheque Selected */}
+    {(paymentMethod === 'bank' || paymentMethod === 'cheque') && (
+      <li className={`${paymentMethod !== 'bank' ? 'pb-2' : ''}`}>
+        <label className='text-xs'>{paymentMethod === 'bank' ? "Transaction ID" : "Cheque Number"}</label>
+        <input
+          type="text"
+          value={transactionId}
+          onChange={(e) => setTransactionId(e.target.value)}
+          className="w-full px-3 py-2 border rounded-md"
+          placeholder={paymentMethod === 'bank' ? "Enter Transaction ID" : "Enter Cheque Number"}
+        />
+      </li>
+    )}
+
+    {/* Partial Payment Input */}
+    {paymentStatus === 'partial' && (
+      <li className="pb-4">
+        <label htmlFor="partial_amount" className='text-xs'>Partial Amount</label>
+        <input
+          type="number"
+          value={partialAmount}
+          onChange={(e) => setPartialAmount(e.target.value)}
+          className="w-full px-3 py-2 border rounded-md"
+          placeholder="Enter Partial Amount"
+        />
+      </li>
+    )}
+    {/* <li className='text-black font-bold mb-5 mt-10'>Customer Details</li> */}
+    <li className="py-4 border-t">
+      <h6 className="text-black font-bold my-3">Customer Details</h6>
+
+      {/* Customer Phone */}
+      <label htmlFor="phone_number" className='text-xs'>Phone Number</label>
+      <input
+        type="text"
+        value={customerPhone}
+        onChange={(e) => setCustomerPhone(e.target.value)}
+        className="w-full mb-2 px-3 py-2 border rounded-md"
+        placeholder="Phone Number"
+      />
+
+      {/* Customer Name */}
+      <label htmlFor="customer_name" className='text-xs'>Customer Name</label>
+      <input
+        type="text"
+        value={customerName}
+        onChange={(e) => setCustomerName(e.target.value)}
+        className="w-full mb-2 px-3 py-2 border rounded-md"
+        placeholder="Customer Name"
+      />
+
+      {/* Customer Address */}
+      <label htmlFor="address" className='text-xs'>Address</label>
+      <textarea
+        value={customerAddress}
+        onChange={(e) => setCustomerAddress(e.target.value)}
+        className="w-full mb-2 px-3 py-2 border rounded-md"
+        placeholder="Address"
+        rows={2}
+      />
+    </li>
                             </ul>
                         ) : (
                             <p className="text-gray-400 mt-10 text-center">No items selected.</p>

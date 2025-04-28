@@ -151,6 +151,7 @@ return new class extends Migration
             $table->unsignedBigInteger('restaurant_id');
             $table->string('name');
             $table->decimal('rate', 5, 2);
+            $table->enum('rate_type', ['percent', 'amount'])->default('percent');
             $table->boolean('is_inclusive')->default(false);
             $table->timestamps();
 

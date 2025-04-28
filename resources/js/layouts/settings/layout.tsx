@@ -18,6 +18,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Taxes',
+        href: '/settings/taxes',
+        icon: null,
+    },
+    {
         title: 'Password',
         href: '/settings/password',
         icon: null,

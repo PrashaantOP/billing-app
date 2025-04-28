@@ -48,6 +48,7 @@ class CreateNewBillController extends Controller
 
         // taxes
         $taxes = Tax::where('restaurant_id', $restaurant->id)->where('is_inclusive', 1)->get();
+        // dd($taxes);
 
         if (!$singleCategory) {
             return response()->json(['message' => 'Category not found'], 404);

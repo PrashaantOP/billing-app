@@ -3,6 +3,7 @@
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\StoreController;
+use App\Http\Controllers\Settings\TaxController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -16,6 +17,12 @@ Route::middleware('auth')->group(function () {
     Route::get('settings/store', [StoreController::class, 'edit'])->name('store.edit');
     Route::patch('/settings/store', [StoreController::class, 'update'])->name('store.update');
     // Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('settings/taxes', [TaxController::class, 'index'])->name('taxes.index');
+    // Route::post('settings/taxes', [TaxController::class, 'store'])->name('taxes.store');
+    // Route::patch('settings/taxes/{tax}', [TaxController::class, 'update'])->name('taxes.update');
+    // Route::delete('settings/taxes/{tax}', [TaxController::class, 'destroy'])->name('taxes.destroy');
+
 
     Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');

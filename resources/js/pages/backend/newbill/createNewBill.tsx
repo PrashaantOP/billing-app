@@ -6,13 +6,13 @@ import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
 // import SettingsLayout from '@/layouts/settings/layout';
 import NewBillLayout from '@/layouts/newBill/layout';
-import {  Check, HandCoins, Landmark, LucideBanknote, Minus, Plus, Printer,  ShoppingCart, Split, WalletCards, X } from 'lucide-react';
+import {  Check, HandCoins, Landmark, Minus, Plus, Printer,  ShoppingCart, Split, WalletCards, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Store settings',
-        href: '/settings/store',
+        title: 'Create new order',
+        href: '/newbill/menu',
     },
 ];
 
@@ -52,6 +52,7 @@ type CreateNewBillProps = {
         id: number;
         name: string;
         rate: number;
+        rate_type: string;
     }[];
 }
 
@@ -100,23 +101,42 @@ const increaseQty = (id: number) => {
     });
 };
 
+// const decreaseQty = (id: number) => {
+//     setSelectedItems(items => {
+//         const updated = items.map(i =>
+//             i.id === id && (i.quantity || 1) > 1 ? { ...i, quantity: (i.quantity || 1) - 1 } : i
+//         );
+//         localStorage.setItem('selectedItems', JSON.stringify(updated));
+//         return updated;
+//     });
+// };
+
 const decreaseQty = (id: number) => {
     setSelectedItems(items => {
-        const updated = items.map(i =>
-            i.id === id && (i.quantity || 1) > 1 ? { ...i, quantity: (i.quantity || 1) - 1 } : i
-        );
+        const updated = items.reduce((acc, i) => {
+            if (i.id === id) {
+                if ((i.quantity || 1) > 1) {
+                    acc.push({ ...i, quantity: (i.quantity || 1) - 1 });
+                }
+                // else don't push = remove item
+            } else {
+                acc.push(i);
+            }
+            return acc;
+        }, [] as typeof items);
         localStorage.setItem('selectedItems', JSON.stringify(updated));
         return updated;
     });
 };
 
-const removeItem = (id: number) => {
-    setSelectedItems(items => {
-        const updated = items.filter(i => i.id !== id);
-        localStorage.setItem('selectedItems', JSON.stringify(updated));
-        return updated;
-    });
-};
+
+// const removeItem = (id: number) => {
+//     setSelectedItems(items => {
+//         const updated = items.filter(i => i.id !== id);
+//         localStorage.setItem('selectedItems', JSON.stringify(updated));
+//         return updated;
+//     });
+// };
 
 
 
@@ -127,17 +147,26 @@ useEffect(() => {
     }
 }, []);
 
-useEffect(() => {
-    // setCartOpen(true);
-    console.log('Selected items:', selectedItems);
-}, [selectedItems]);
+// useEffect(() => {
+//     setCartOpen(true);
+//     console.log('Selected items:', selectedItems);
+// }, [selectedItems]);
 
 const total = selectedItems.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0);
 const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
 
 // total with tax
-const totalTax = taxes.reduce((sum, tax) => sum + (total * tax.rate / 100), 0);
-const totalWithTax = total + totalTax;
+
+  
+const totalTax = taxes.reduce((sum, tax) => {
+    const rate = parseFloat(tax.rate);
+    return sum + (tax.rate_type === 'percent' ? (total * rate) / 100 : rate);
+}, 0);
+
+// console.log(totalTax);
+
+  const totalWithTax = total + totalTax;
+//   console.log(totalTax);
 
 
 
@@ -212,7 +241,11 @@ const totalWithTax = total + totalTax;
                                     <div className="flex flex-row items-start gap-3">
                                         <img src={`/assets/images/menuitems/${item.image || "food-default.png"}`} className='w-15 h-15 bg-white rounded object-cover' alt="" />
                                     <div>
-                                    <p className="font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">{item.name}</p>
+                                        <div className="flex flex-col items-start justify-start gap-2">
+                                            <p className="font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">{item.name}</p>
+                                            {/* <Delete className='text-red-600 cursor-pointer' onClick={() => {removeItem(item.id)}} /> */}
+                                        </div>
+                                    
                                 </div>
                                     </div>
 
@@ -227,22 +260,32 @@ const totalWithTax = total + totalTax;
                                 </li>
                             ))}
                             {taxes.length > 0 ? (
-                        taxes.map((item) => (
-                            <li key={item.id} className="flex justify-between gap-4 items-center ">
-                                <div className="flex">
-                                    <span className='text-xs '>{item.name}</span>
-                                    <span className='text-xs '>({item.rate}%)</span>
-                                </div>
-                                <span className='text-xs text-semibold'><span className='text-green-600'>+</span> {total*item.rate/100}</span>
-                            </li>
-                        ))
-                            ) : (
-                                <div>No taxes available</div>
-                            )}
-                            <li className="pt-4 border-t font-bold flex justify-between gap-4 mb-15">
-                                <span>Total:</span>
-                                <span>₹{totalWithTax}</span>
-                            </li>
+    taxes.map((item) => {
+        const rate = parseFloat(item.rate);
+        const taxAmount = item.rate_type === 'percent' ? (total * rate) / 100 : rate;
+
+        return (
+            <li key={item.id} className="flex justify-between gap-4 items-center">
+                <div className="flex">
+                    <span className="text-xs">{item.name}</span>
+                    <span className="text-xs">
+                        ({item.rate_type === 'percent' ? `${rate}%` : `₹${rate}`})
+                    </span>
+                </div>
+                <span className="text-xs font-semibold">
+                    <span className="text-green-600">+</span> ₹{taxAmount.toFixed(2)}
+                </span>
+            </li>
+        );
+    })
+) : (
+    <div>No taxes available</div>
+)}
+
+<li className="pt-4 border-t font-bold flex justify-between gap-4 mb-15">
+    <span>Total:</span>
+    <span>₹{totalWithTax.toFixed(2)}</span>
+</li>
 
                             {/* Payment Status Selection */}
                             <li className='text-black font-bold'>Payment Details</li>
@@ -478,6 +521,7 @@ const totalWithTax = total + totalTax;
                                         alt={item.name}
                                         className="w-10 h-10 rounded-full border-2 border-green-600 object-cover"
                                     />
+                                    
                                     ))}
                                 </motion.div>
                                 {/* Info section */}

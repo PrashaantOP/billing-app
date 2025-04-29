@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import InputError from '@/components/input-error';
@@ -17,28 +17,36 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import toast from 'react-hot-toast';
+import { Pencil } from 'lucide-react';
 
-export default function NewCustomer() {
+type customerType = {
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+    id: number;
+};
+export default function EditCustomer({ customer }: { customer: customerType }) {
     const [open, setOpen] = useState(false);
-    const { data, setData, post, processing, reset, errors, clearErrors } = useForm({
-        name: '',
-        phone: '',
-        email: '',
-        address: '', // added address
+    const { data, setData, patch, processing, reset, errors, clearErrors } = useForm({
+        name: customer.name ?? '',
+        phone: customer.phone ?? '',
+        email: customer.email ?? '',
+        address: customer.address ?? '',
+        id: customer.id,
     });
 
 
     const submitCustomer: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(route('customers.store'), {
+        patch(route('customers.update'), {
             preserveScroll: true,
             onSuccess: () => {
+                // router.reload({ only: ['customers'] });
                 closeModal();
-                toast.success('Customer details added succesfull!');
-            }
-
-            ,
+                toast.success('Customer details updated succesfully!');
+            },
         });
     };
 
@@ -50,12 +58,12 @@ export default function NewCustomer() {
 
 
 
-
     return (
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="destructive" onClick={() => setOpen(true)}>New Customer</Button>
+                    <Pencil className="w-4 h-4" onClick={() => setOpen(true)} />
+                    {/* <Button variant="destructive" >New Customer</Button> */}
                 </DialogTrigger>
                 <DialogContent>
                     <DialogTitle>Add New Customer</DialogTitle>

@@ -5,6 +5,7 @@ import { Head, useForm, router } from '@inertiajs/react';
 import { Pencil, Trash } from 'lucide-react';
 import { useState } from 'react';
 import NewCustomer from './newCustomer';
+import EditCustomer from './editCustomer';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -36,8 +37,7 @@ type Props = {
 };
 
 export default function Customers({ customers }: Props) {
-  const [editing, setEditing] = useState<Customer | null>(null);
-
+//   const [editing, setEditing] = useState<Customer | null>(null);
   const { data, setData, post, put, delete: destroy, reset } = useForm({
     name: '',
     phone: '',
@@ -45,15 +45,7 @@ export default function Customers({ customers }: Props) {
     address: '',
   });
 
-  const handleEdit = (customer: Customer) => {
-    setEditing(customer);
-    setData({
-      name: customer.name,
-      phone: customer.phone || '',
-      email: customer.email || '',
-      address: customer.address || '',
-    });
-  };
+
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -65,7 +57,7 @@ export default function Customers({ customers }: Props) {
         <div className='w-1/2 flex justify-end'>
         <NewCustomer />
         </div>
-        
+
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-4">
@@ -105,8 +97,8 @@ export default function Customers({ customers }: Props) {
                   </td>
                   <td className="px-6 py-4 text-end text-sm font-medium">
                     <div className="flex gap-x-3 justify-end">
-                      <button onClick={() => handleEdit(customer)} className="text-gray-600 hover:text-gray-800 dark:text-gray-500 dark:hover:text-gray-400">
-                        <Pencil className="w-4 h-4" />
+                      <button className="text-gray-600 hover:text-gray-800 dark:text-gray-500 dark:hover:text-gray-400 cursor-pointer">
+                        <EditCustomer customer={customer} />
                       </button>
                       <button onClick={() => destroy(route('customers.destroy', customer.id))} className="text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400">
                         <Trash className="w-4 h-4" />

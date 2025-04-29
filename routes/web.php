@@ -20,9 +20,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('plans', [PlansController::class, 'viewPlans'])->name('plans');
 
-    // customers 
+    // customers
     Route::get('customers/view', [CustomersController::class, 'index'])->name('customers.view');
     Route::post('/customers', [CustomersController::class, 'store'])->name('customers.store');
+    Route::patch('/customers/update', [CustomersController::class, 'update'])->name('customers.update');
+
 });
 
 require __DIR__ . '/settings.php';

@@ -42,18 +42,34 @@ class CustomersController extends Controller
 
 
 
-    public function update(Request $request, Customer $customer)
+    // public function update(Request $request, Customer $customer)
+    // {
+    //     $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'phone' => 'nullable|string',
+    //         'email' => 'nullable|email',
+    //         'address' => 'nullable|string',
+    //     ]);
+
+    //     $customer->update($request->only('name', 'phone', 'email', 'address'));
+
+    //     return redirect()->back()->with('success', 'Customer updated.');
+    // }
+
+    public function update(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
+            'id' => 'required|exists:customers,id',
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|string',
-            'email' => 'nullable|email',
-            'address' => 'nullable|string',
+            'phone' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
+            'address' => 'nullable|string|max:1000',
         ]);
 
-        $customer->update($request->only('name', 'phone', 'email', 'address'));
+        $customer = Customer::findOrFail($validated['id']);
+        $customer->update($validated);
 
-        return redirect()->back()->with('success', 'Customer updated.');
+        return redirect()->back()->with('success', 'Customer updated successfully.');
     }
 
     public function destroy(Customer $customer)

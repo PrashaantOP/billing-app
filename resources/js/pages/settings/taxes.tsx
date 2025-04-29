@@ -64,8 +64,7 @@ export default function TaxManagement() {
                     <HeadingSmall title="Manage Taxes" description="Add or update your taxes" />
 
                     {/* Add / Update Form */}
-                    {/* <form onSubmit={submit} className="space-y-6">
-                    </form> */}
+                    <form onSubmit={submit} className="space-y-6">
                         <div className="">
                             <Label htmlFor="name">Tax Name</Label>
                             <Input
@@ -187,7 +186,7 @@ export default function TaxManagement() {
                                 <p className="text-sm text-neutral-600">Saved</p>
                             </Transition>
                         </div>
-                    {/* </form> */}
+                    </form>
 
 {/* table start  */}
 <h3 className="text-lg font-semibold mt-10">Existing Taxes</h3>

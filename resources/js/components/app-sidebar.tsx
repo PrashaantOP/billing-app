@@ -50,7 +50,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Taxes',
-        href: '/taxes',
+        href: '/settings/taxes',
         icon: Percent,
     },
     {

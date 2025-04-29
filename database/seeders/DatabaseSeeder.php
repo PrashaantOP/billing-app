@@ -25,5 +25,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             TaxSeeder::class,
         ]);
+
+        $this->call([
+            CustomerSeeder::class,
+        ]);
     }
 }

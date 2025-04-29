@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Administator\PlansController;
+use App\Http\Controllers\CustomersController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -17,8 +18,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //     return Inertia::render('backend/plans/plans');
     // })->name('plans');
 
-    Route::get('plans', [PlansController::class, 'viewPlans'])
-        ->name('plans');
+    Route::get('plans', [PlansController::class, 'viewPlans'])->name('plans');
+
+    // customers 
+    Route::get('customers/view', [CustomersController::class, 'index'])->name('customers.view');
+    Route::post('/customers', [CustomersController::class, 'store'])->name('customers.store');
 });
 
 require __DIR__ . '/settings.php';

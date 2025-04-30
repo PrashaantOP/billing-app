@@ -33,7 +33,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function TaxManagement() {
     const { taxes } = usePage<SharedData & { taxes: any[] }>().props;
-    
+
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -46,13 +46,13 @@ export default function TaxManagement() {
                       <HeadingSmall title="Manage Taxes" description="Add or update your taxes" />
                       </div>
                       <div className="flex w-1/2 justify-end">
-                      <AddNewTax />
+                      <AddNewTax varient={'destructive'} size={'lg'} />
                       </div>
                   </div>
-                    
+
 
                     {/* Add / Update Form */}
-                    
+
 
 {/* table start  */}
 <div className="border border-gray-200 rounded-lg overflow-hidden dark:border-neutral-700 block">

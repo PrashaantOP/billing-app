@@ -75,18 +75,7 @@ export default function EditTaxes({ taxes }: { taxes: TaxesType }) {
                 <DialogDescription>Update the selected tax details.</DialogDescription>
 
                 <form onSubmit={updateTax} className="space-y-6">
-                    <div>
-                        <Label htmlFor="name">Tax Name</Label>
-                        <Input
-                            id="name"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            required
-                        />
-                        <InputError className="mt-2" message={errors.name} />
-                    </div>
-
-                    <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6">
                         <div>
                             <Label htmlFor="rate_type">Rate Type</Label>
                             <select
@@ -121,7 +110,7 @@ export default function EditTaxes({ taxes }: { taxes: TaxesType }) {
                                     );
                                 })}
                             </select>
-                            
+
                             ) : (
                                 <Input
                                     id="rate"
@@ -136,6 +125,18 @@ export default function EditTaxes({ taxes }: { taxes: TaxesType }) {
                             <InputError className="mt-2" message={errors.rate} />
                         </div>
                     </div>
+                    <div>
+                        <Label htmlFor="name">Tax Name</Label>
+                        <Input
+                            id="name"
+                            value={data.name}
+                            onChange={(e) => setData('name', e.target.value)}
+                            required
+                        />
+                        <InputError className="mt-2" message={errors.name} />
+                    </div>
+
+
 
                     <div className="flex items-center gap-3">
                         <div className="relative w-7 h-7">

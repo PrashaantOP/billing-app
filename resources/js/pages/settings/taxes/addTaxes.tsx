@@ -1,7 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, CheckCircle2, Circle, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,12 @@ import {
 
 import toast from 'react-hot-toast';
 
-export default function AddNewTax() {
+type addbtnprop = {
+    varient: string;
+    size: string;
+}
+
+export default function AddNewTax({varient, size}: addbtnprop) {
     const [open, setOpen] = useState(false);
     // const [recentlySuccessful, setRecentlySuccessful] = useState(false);
 
@@ -55,7 +60,7 @@ export default function AddNewTax() {
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="destructive">Add New Tax</Button>
+                    <Button variant={varient} size={size}>Add New Tax</Button>
                 </DialogTrigger>
 
                 <DialogContent>
@@ -170,7 +175,7 @@ export default function AddNewTax() {
 
                         <DialogFooter className="flex items-center gap-4">
                             <Button type="submit" disabled={processing}>Save</Button>
-                            
+
                         </DialogFooter>
                     </form>
                 </DialogContent>

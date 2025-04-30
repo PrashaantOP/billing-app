@@ -9,6 +9,7 @@ import NewBillLayout from '@/layouts/newBill/layout';
 import {  Check, HandCoins, Landmark, Minus, Plus, Printer,  ShoppingCart, Split, WalletCards, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EditTaxes from '@/pages/settings/taxes/editTaxes';
+import AddNewTax from '@/pages/settings/taxes/addTaxes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -66,7 +67,7 @@ export default function CreateNewBill({ categories, menuitems, categoryname, tax
    const [cartOpen, setCartOpen] = useState(false);
 const [selectedItems, setSelectedItems] = useState<MenuItemType[]>([]);
 
-// payment status 
+// payment status
 const [paymentStatus, setPaymentStatus] = useState('');
 const [paymentMethod, setPaymentMethod] = useState('');
 const [transactionId, setTransactionId] = useState('');
@@ -158,7 +159,7 @@ const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
 
 // total with tax
 
-  
+
 const totalTax = taxes.reduce((sum, tax) => {
     const rate = parseFloat(tax.rate);
     return sum + (tax.rate_type === 'percent' ? (total * rate) / 100 : rate);
@@ -246,7 +247,7 @@ const totalTax = taxes.reduce((sum, tax) => {
                                             <p className="font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">{item.name}</p>
                                             {/* <Delete className='text-red-600 cursor-pointer' onClick={() => {removeItem(item.id)}} /> */}
                                         </div>
-                                    
+
                                 </div>
                                     </div>
 
@@ -282,6 +283,8 @@ const totalTax = taxes.reduce((sum, tax) => {
 ) : (
     <div>No taxes available</div>
 )}
+<AddNewTax varient={'link'} size={'nopd'} />
+
 
 <li className="pt-4 border-t font-bold flex justify-between gap-4 mb-15">
     <span>Total:</span>
@@ -522,7 +525,7 @@ const totalTax = taxes.reduce((sum, tax) => {
                                         alt={item.name}
                                         className="w-10 h-10 rounded-full border-2 border-green-600 object-cover"
                                     />
-                                    
+
                                     ))}
                                 </motion.div>
                                 {/* Info section */}

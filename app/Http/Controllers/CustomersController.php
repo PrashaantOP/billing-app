@@ -72,9 +72,11 @@ class CustomersController extends Controller
         return redirect()->back()->with('success', 'Customer updated successfully.');
     }
 
-    public function destroy(Customer $customer)
+    public function destroy($id)
     {
+        $customer = Customer::findOrFail($id);
         $customer->delete();
-        return redirect()->back()->with('success', 'Customer deleted.');
+
+        return back()->with('success', 'Customer deleted successfully.');
     }
 }

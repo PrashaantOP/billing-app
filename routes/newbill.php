@@ -17,7 +17,7 @@ Route::middleware('auth')->group(function () {
         if ($singleCategory) {
             return redirect('newbill/menu/' . $singleCategory->slug);
         } else {
-            return redirect('/dashboard');
+            return redirect('settings.taxes');
         }
     });
     // Route::redirect('newbill/menu', 'newbill/menu/{$singleCategory->slug}');

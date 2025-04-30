@@ -8,6 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import NewBillLayout from '@/layouts/newBill/layout';
 import {  Check, HandCoins, Landmark, Minus, Plus, Printer,  ShoppingCart, Split, WalletCards, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import EditTaxes from '@/pages/settings/taxes/editTaxes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -268,8 +269,8 @@ const totalTax = taxes.reduce((sum, tax) => {
             <li key={item.id} className="flex justify-between gap-4 items-center">
                 <div className="flex">
                     <span className="text-xs">{item.name}</span>
-                    <span className="text-xs">
-                        ({item.rate_type === 'percent' ? `${rate}%` : `₹${rate}`})
+                    <span className="text-xs flex flex-row items-center gap-2 ml-2">
+                        ({item.rate_type === 'percent' ? `${rate}%` : `₹${rate}`})<EditTaxes taxes={item} />
                     </span>
                 </div>
                 <span className="text-xs font-semibold">

@@ -35,7 +35,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Menu Categories',
-        href: '/categories',
+        href: '/menu/categories',
         icon: CopyPlus,
     },
     {

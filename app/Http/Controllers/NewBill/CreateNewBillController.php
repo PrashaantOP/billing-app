@@ -41,6 +41,9 @@ class CreateNewBillController extends Controller
     {
         $restaurant = Auth::user()->restaurant;
         $categories = category::where('restaurant_id', $restaurant->id)->get();
+        if (!$categories) {
+            return Inertia::location(route('taxes.index'));
+        }
         $taxes = Tax::where('restaurant_id', $restaurant->id)
             ->where('is_inclusive', true)
             ->get();

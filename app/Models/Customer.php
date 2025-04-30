@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model
 {
+    protected $table = 'customers';
     protected $fillable = ['restaurant_id', 'name', 'phone', 'email', 'address'];
 
     public function restaurant()

@@ -19,9 +19,9 @@ Route::middleware('auth')->group(function () {
     // Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('settings/taxes', [TaxController::class, 'index'])->name('taxes.index');
-    // Route::post('settings/taxes', [TaxController::class, 'store'])->name('taxes.store');
-    // Route::patch('settings/taxes/{tax}', [TaxController::class, 'update'])->name('taxes.update');
-    // Route::delete('settings/taxes/{tax}', [TaxController::class, 'destroy'])->name('taxes.destroy');
+    Route::post('settings/taxes', [TaxController::class, 'store'])->name('taxes.store');
+    Route::patch('settings/taxes/update', [TaxController::class, 'update'])->name('taxes.update');
+    Route::delete('settings/destroy/{tax}', [TaxController::class, 'destroy'])->name('taxes.destroy');
 
 
     Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');

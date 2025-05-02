@@ -32,7 +32,7 @@ export default function AddNewTax({varient, size}: addbtnprop) {
         name: '',
         rate_type: 'percent',
         rate: '',
-        is_inclusive: false,
+        is_inclusive: true,
     });
 
     const submit: FormEventHandler = (e) => {

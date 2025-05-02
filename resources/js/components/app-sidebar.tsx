@@ -40,7 +40,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Menu Items',
-        href: '/menu-items',
+        href: '/menu/items',
         icon: SquarePlus,
     },
     {

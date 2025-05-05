@@ -20,8 +20,9 @@ type MenuItemsData = {
     name: string;
     description: string;
     price: number;
-    is_available: string;
+    is_available: number;
     created_at: string;
+    updated_at: string;
     category: {
       id: number;
       name: string;
@@ -100,10 +101,22 @@ export default function Customers({ menuItems }: Props) {
               minute: '2-digit',
             })}
           </td>
+          <td className="block md:table-cell px-6 py-4 text-sm font-medium">
+            <span className="md:hidden font-semibold">Status: </span>
+            <span
+              className={`px-3 py-1 text-xs font-medium rounded-full ${
+                mitem.is_available === 1
+                  ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                  : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
+              }`}
+            >
+              {mitem.is_available ? 'Active' : 'Not Active'}
+            </span>
+          </td>
           <td className="px-4 py-4 text-end text-sm font-medium">
             <div className="flex gap-x-3 justify-end">
               <button className="text-gray-600 hover:text-gray-800 dark:text-gray-500 dark:hover:text-gray-400">
-                <EditMenuItems singleMenuItem={mitem} />
+                <EditMenuItems key={mitem.id + '-' + mitem.updated_at} singleMenuItem={mitem} />
               </button>
               <button className="text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400">
                 {/* <DeleteCategoryButton id={category.id} /> */}

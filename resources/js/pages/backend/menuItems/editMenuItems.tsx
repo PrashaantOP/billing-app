@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
 import InputError from '@/components/input-error';
@@ -56,7 +56,7 @@ export default function EditMenuItems({ singleMenuItem }: { singleMenuItem: Menu
         if (!open) {
             reset();
             clearErrors();
-    
+
             if (singleMenuItem.image) {
                 setPreviewImage('/assets/images/menuitems/' + singleMenuItem.image);
             } else {
@@ -81,6 +81,7 @@ export default function EditMenuItems({ singleMenuItem }: { singleMenuItem: Menu
             onSuccess: () => {
                 toast.success('Menu item updated successfully!');
                 setOpen(false);
+                router.reload();
             },
         });
     };

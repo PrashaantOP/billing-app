@@ -20,6 +20,7 @@ type Customer = {
   phone: string | null;
   address: string | null;
   created_at: string;
+  updated_at: string;
 };
 
 type Props = {
@@ -88,7 +89,7 @@ export default function Customers({ customers }: Props) {
           <td className="px-4 py-4 text-end text-sm font-medium">
             <div className="flex gap-x-3 justify-end">
               <button className="text-gray-600 hover:text-gray-800 dark:text-gray-500 dark:hover:text-gray-400">
-                <EditCustomer customer={customer} />
+                <EditCustomer key={customer.id + '-' + customer.updated_at} customer={customer} />
               </button>
               <button className="text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400">
                 <DeleteCustomerButton id={customer.id} />

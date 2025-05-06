@@ -17,9 +17,14 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 
-import { Pencil, Circle, Check, ImagePlus } from 'lucide-react';
+import { Pencil, Circle, Check, ImagePlus, Cross, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+
+type CategoryType = {
+    id: number;
+    name: string;
+};
 
 type MenuItemType = {
     id: number;
@@ -28,9 +33,21 @@ type MenuItemType = {
     description: string;
     price: string;
     is_available: boolean;
+    category: {
+        id: number;
+        name: string;
+        slug: string;
+        created_at: string;
+      }
 };
 
-export default function EditMenuItems({ singleMenuItem }: { singleMenuItem: MenuItemType }) {
+export default function EditMenuItems({
+    singleMenuItem,
+    categories,
+}: {
+    singleMenuItem: MenuItemType;
+    categories: CategoryType[];
+}) {
     const [open, setOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState<string | null>(singleMenuItem.image);
 
@@ -43,12 +60,13 @@ export default function EditMenuItems({ singleMenuItem }: { singleMenuItem: Menu
         image: File | null;
     };
 
-    const { data, setData, patch, processing, reset, errors, clearErrors } = useForm<FormDataType>({
+    const { data, setData, post, processing, reset, errors, clearErrors } = useForm<FormDataType & { category_id: number }>({
         name: singleMenuItem.name,
         description: singleMenuItem.description || '',
         price: singleMenuItem.price,
         is_available: singleMenuItem.is_available,
         image: null,
+        category_id: singleMenuItem.category.id,
         id: singleMenuItem.id,
     });
 
@@ -76,7 +94,18 @@ export default function EditMenuItems({ singleMenuItem }: { singleMenuItem: Menu
     const updateMenuItem: FormEventHandler = (e) => {
         e.preventDefault();
 
-        patch(route('menu-items.update'), {
+       // const formData = new FormData();
+       // formData.append('id', String(data.id));
+       // formData.append('name', data.name);
+       // formData.append('description', data.description);
+       // formData.append('price', data.price);
+       // formData.append('is_available', data.is_available ? '1' : '0');
+       // formData.append('category_id', String(data.category_id));
+       // if (data.image) {
+       //     formData.append('image', data.image);
+       // }
+
+        post(route('menu-items.update'), {
             preserveScroll: true,
             onSuccess: () => {
                 toast.success('Menu item updated successfully!');
@@ -104,6 +133,23 @@ export default function EditMenuItems({ singleMenuItem }: { singleMenuItem: Menu
                 <DialogDescription>Update the menu item details below.</DialogDescription>
 
                 <form onSubmit={updateMenuItem} className="space-y-5">
+                <div>
+                <Label htmlFor="category">Category</Label>
+                <select
+                    id="category"
+                    value={data.category_id}
+                    onChange={(e) => setData('category_id', Number(e.target.value))}
+                    className="w-full mt-1 border rounded px-3 py-2 text-sm"
+                >
+                    {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                        </option>
+                    ))}
+                </select>
+                <InputError className="mt-1" message={errors.category_id} />
+            </div>
+
                     <div>
                         <Label htmlFor="name">Name</Label>
                         <Input
@@ -186,7 +232,7 @@ export default function EditMenuItems({ singleMenuItem }: { singleMenuItem: Menu
                                         </motion.div>
                                     ) : (
                                         <motion.div key="unchecked" {...animationProps}>
-                                            <Circle size={20} className="text-gray-400" />
+                                            <X size={20} className="text-red-400" />
                                         </motion.div>
                                     )}
                                 </AnimatePresence>

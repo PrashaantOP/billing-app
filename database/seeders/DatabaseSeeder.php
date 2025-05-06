@@ -15,19 +15,20 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        $this->call([
-            StoreSeeder::class,
-            UserSeeder::class,
-            CategorySeeder::class,
-            MenuItemSeeder::class,
-        ]);
+        // $this->call([
+        //     StoreSeeder::class,
+        //     UserSeeder::class,
+        //     CategorySeeder::class,
+        //     MenuItemSeeder::class,
+        // ]);
 
-        $this->call([
-            TaxSeeder::class,
-        ]);
+        // $this->call([
+        //     TaxSeeder::class,
+        // ]);
 
-        $this->call([
-            CustomerSeeder::class,
-        ]);
+        // $this->call([
+        //     CustomerSeeder::class,
+        // ]);
+        $this->call(DiningTableSeeder::class);
     }
 }

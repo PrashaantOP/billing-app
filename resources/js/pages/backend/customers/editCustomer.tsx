@@ -62,7 +62,7 @@ export default function EditCustomer({ customer }: { customer: customerType }) {
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Pencil className="w-4 h-4" onClick={() => setOpen(true)} />
+                    <Pencil className="w-4 h-4 cursor-pointer" onClick={() => setOpen(true)} />
                     {/* <Button variant="destructive" >New Customer</Button> */}
                 </DialogTrigger>
                 <DialogContent>

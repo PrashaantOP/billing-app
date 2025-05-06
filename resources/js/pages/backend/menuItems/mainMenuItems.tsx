@@ -1,10 +1,12 @@
 import Heading from '@/components/heading';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import EditMenuItems from './editMenuItems';
 import { IndianRupee } from 'lucide-react';
+import DeleteMenuButton from './deleteMenuItems';
+import NewMenuItem from './addMenuItems';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -13,26 +15,28 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
+type CategoryType = {
+  id: number;
+  name: string;
+  slug: string;
+  created_at: string;
+};
+
 type MenuItemsData = {
-    id: number;
-    category_id: number;
-    image: string;
-    name: string;
-    description: string;
-    price: number;
-    is_available: number;
-    created_at: string;
-    updated_at: string;
-    category: {
-      id: number;
-      name: string;
-      slug: string;
-      created_at: string;
-    }
+  id: number;
+  category_id: number;
+  image: string;
+  name: string;
+  description: string;
+  price: number;
+  is_available: number;
+  created_at: string;
+  updated_at: string;
+  category: CategoryType;
 };
 
 type Props = {
-    menuItems: {
+  menuItems: {
     data: MenuItemsData[];
     current_page: number;
     last_page: number;
@@ -42,29 +46,30 @@ type Props = {
       active: boolean;
     }[];
   };
+  categories: CategoryType[];
 };
 
-export default function Customers({ menuItems }: Props) {
+export default function Customers({ menuItems, categories }: Props) {
 //   const [editing, setEditing] = useState<Customer | null>(null);
-
-
 
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Menu Items" />
-      <div className="px-4 pt-6 w-full 2xl:w-1/2 flex">
+      <div className="px-4 pt-6 w-full 2xl:w-2/3 flex">
         <div className='w-1/2'>
         <Heading title="Our Menu Items" description="Manage our menu items" />
         </div>
         <div className='w-1/2 flex justify-end'>
         {/* <AddNewCategory /> */}
+        <NewMenuItem categories={categories} />
+
         </div>
 
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-4">
-        <div className="border border-gray-200 rounded-lg overflow-hidden dark:border-neutral-700 w-full 2xl:w-1/2">
+        <div className="border border-gray-200 rounded-lg overflow-hidden dark:border-neutral-700 w-full 2xl:w-2/3">
         <div className="w-full overflow-x-auto">
   <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
     <thead className="bg-gray-50 dark:bg-neutral-700">
@@ -74,6 +79,7 @@ export default function Customers({ menuItems }: Props) {
         <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400 ">Menu Items</th>
         <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400 ">Price</th>
         <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400 hidden lg:block">Created At</th>
+        <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400">Status</th>
         <th className="px-4 py-3 text-end text-xs font-medium text-gray-500 uppercase dark:text-neutral-400">Action</th>
       </tr>
     </thead>
@@ -102,12 +108,12 @@ export default function Customers({ menuItems }: Props) {
             })}
           </td>
           <td className="block md:table-cell px-6 py-4 text-sm font-medium">
-            <span className="md:hidden font-semibold">Status: </span>
+            {/* <span className="md:hidden font-semibold">Status: </span> */}
             <span
               className={`px-3 py-1 text-xs font-medium rounded-full ${
                 mitem.is_available === 1
                   ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                  : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
+                  : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300 whitespace-nowrap"
               }`}
             >
               {mitem.is_available ? 'Active' : 'Not Active'}
@@ -116,10 +122,11 @@ export default function Customers({ menuItems }: Props) {
           <td className="px-4 py-4 text-end text-sm font-medium">
             <div className="flex gap-x-3 justify-end">
               <button className="text-gray-600 hover:text-gray-800 dark:text-gray-500 dark:hover:text-gray-400">
-                <EditMenuItems key={mitem.id + '-' + mitem.updated_at} singleMenuItem={mitem} />
+                <EditMenuItems key={mitem.id + '-' + mitem.updated_at} singleMenuItem={mitem} categories={categories} />
               </button>
               <button className="text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400">
                 {/* <DeleteCategoryButton id={category.id} /> */}
+                <DeleteMenuButton id={mitem.id} />
               </button>
             </div>
           </td>

@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Administator\PlansController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomersController;
+use App\Http\Controllers\DiningTableController;
 use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
@@ -36,7 +37,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // menu items
     Route::get('menu/items', [ProductController::class, 'index'])->name('menu.item.view');
-    Route::patch('/menu-items/udpate', [ProductController::class, 'update'])->name('menu-items.update');
+    Route::post('/menu-items/store', [ProductController::class, 'store'])->name('menu.item.store');
+    Route::post('/menu-items/udpate', [ProductController::class, 'update'])->name('menu-items.update');
+    Route::delete('/menuitem/destroy/{id}', [ProductController::class, 'destroy'])->name('menu.item.destroy');
+
+    // dining tables
+    Route::get('/dining-tables', [DiningTableController::class, 'index'])->name('dining.tables.index');
 });
 
 require __DIR__ . '/settings.php';

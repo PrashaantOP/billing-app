@@ -22,6 +22,12 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface CompItem {
+    name: string;
+    logo?: LucideIcon | null;
+    plan: string;
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };

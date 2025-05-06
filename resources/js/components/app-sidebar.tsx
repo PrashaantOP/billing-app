@@ -2,10 +2,11 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
+import { CompItem, type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen,  CopyPlus, DollarSign, FilePlus, Folder, Gem, History, LayoutGrid, PackageCheck, Percent, ReceiptText, SquarePlus, Store, Table, Users } from 'lucide-react';
+import { AudioWaveform, BookOpen,  Command,  CopyPlus, DollarSign, FilePlus, Folder, GalleryVerticalEnd, Gem, History, LayoutGrid, PackageCheck, Percent, ReceiptText, SquarePlus, Store, Table, Users } from 'lucide-react';
 import AppLogo from './app-logo';
+import { TeamSwitcher } from './team-switcher';
 
 const mainNavItems: NavItem[] = [
     {
@@ -70,6 +71,24 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
+const companies: CompItem[] = [
+    {
+        name: "Acme Inc",
+        logo: GalleryVerticalEnd,
+        plan: "Enterprise",
+      },
+      {
+        name: "Acme Corp.",
+        logo: AudioWaveform,
+        plan: "Startup",
+      },
+      {
+        name: "Evil Corp.",
+        logo: Command,
+        plan: "Free",
+      },
+];
+
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
@@ -87,7 +106,7 @@ export function AppSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
-                <SidebarMenu>
+                {/* <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/dashboard" prefetch>
@@ -95,7 +114,8 @@ export function AppSidebar() {
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                </SidebarMenu>
+                </SidebarMenu> */}
+                <TeamSwitcher teams={companies} />
             </SidebarHeader>
 
             <SidebarContent>

@@ -14,9 +14,15 @@ class StoreSeeder extends Seeder
      */
     public function run(): void
     {
-        Restaurant::create([
-            'name' => 'Your Store',
-            'email' => 'pk1093524@gmail.com',
+        Restaurant::insert([
+            [
+                'name' => 'Your Store',
+                'email' => 'pk1093524@gmail.com',
+            ],
+            [
+                'name' => 'Your Store',
+                'email' => 'pk1093525@gmail.com',
+            ],
         ]);
     }
 }

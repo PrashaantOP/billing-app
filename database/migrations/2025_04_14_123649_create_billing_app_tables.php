@@ -39,7 +39,6 @@ return new class extends Migration
         // Users
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('restaurant_id');
             $table->string('name');
             $table->string('image')->nullable();
             $table->string('email')->unique();
@@ -48,11 +47,8 @@ return new class extends Migration
             $table->string('otp')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['admin', 'staff'])->default('staff');
             $table->rememberToken();
             $table->timestamps();
-
-            $table->foreign('restaurant_id')->references('id')->on('restaurants');
         });
 
         // Tables (seating)

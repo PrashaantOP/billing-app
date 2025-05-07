@@ -15,13 +15,13 @@ class CreateNewBillController extends Controller
 {
     public function newBillShow()
     {
-        $restaurant = Auth::user()->restaurant;
-        $categories = category::where('restaurant_id', $restaurant->id)->get();
+        $restaurant_id = session('current_restaurant_id');
+        $categories = category::where('restaurant_id', $restaurant_id)->get();
 
         // taxes
-        $taxes = Tax::where('restaurant_id', $restaurant->id)->where('is_inclusive', 1)->get();
+        $taxes = Tax::where('restaurant_id', $restaurant_id)->where('is_inclusive', 1)->get();
 
-        $singleCategory = category::where('restaurant_id', $restaurant->id)->first();
+        $singleCategory = category::where('restaurant_id', $restaurant_id)->first();
         if (!$singleCategory) {
             return response()->json(['message' => 'Category not found'], 404);
         }
@@ -39,18 +39,18 @@ class CreateNewBillController extends Controller
 
     public function getItemUsingSlug($slug)
     {
-        $restaurant = Auth::user()->restaurant;
-        $categories = category::where('restaurant_id', $restaurant->id)->get();
+        $restaurant_id = session('current_restaurant_id');
+        $categories = category::where('restaurant_id', $restaurant_id)->get();
         if (!$categories) {
             return Inertia::location(route('taxes.index'));
         }
-        $taxes = Tax::where('restaurant_id', $restaurant->id)
+        $taxes = Tax::where('restaurant_id', $restaurant_id)
             ->where('is_inclusive', true)
             ->get();
-        $singleCategory = Category::where('slug', $slug)->where('restaurant_id', $restaurant->id)->first();
+        $singleCategory = Category::where('slug', $slug)->where('restaurant_id', $restaurant_id)->first();
 
         // taxes
-        $taxes = Tax::where('restaurant_id', $restaurant->id)->where('is_inclusive', 1)->get();
+        $taxes = Tax::where('restaurant_id', $restaurant_id)->where('is_inclusive', 1)->get();
         // dd($taxes);
 
         if (!$singleCategory) {

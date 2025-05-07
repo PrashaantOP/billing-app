@@ -15,7 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('restaurant_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->enum('role', ['admin', 'staff'])->default('staff');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->unique(['restaurant_id', 'user_id']);
         });
     }
 

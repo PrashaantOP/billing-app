@@ -18,22 +18,23 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'restaurant_id',
         'name',
         'image',
         'email',
         'mobile',
         'otp',
         'otp_expires_at',
-        'password',
-        'role'
+        'password'
     ];
 
     protected $hidden = ['password', 'remember_token'];
 
-    public function restaurant()
+    public function restaurants()
     {
-        return $this->belongsTo(Restaurant::class);
+        return $this->belongsToMany(Restaurant::class)
+            ->using(\App\Models\RestaurantUser::class) // tell Laravel to use this model for the pivot
+            ->withPivot(['role', 'is_active'])
+            ->withTimestamps();
     }
 
     public function logs()

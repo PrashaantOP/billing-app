@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import InputError from '@/components/input-error';
@@ -58,6 +58,7 @@ export default function NewMenuItem({ categories }: { categories: Category[] }) 
             onSuccess: () => {
                 closeModal();
                 toast.success('Menu item added successfully!');
+                router.reload();
             },
         });
     };

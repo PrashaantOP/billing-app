@@ -12,7 +12,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::where('restaurant_id', Auth::user()->restaurant_id)
+        $categories = Category::where('restaurant_id', session('current_restaurant_id'))
             ->latest()
             ->paginate(5); // Show 10 per page
 
@@ -27,7 +27,7 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        $restaurant_id = Auth::user()->restaurant_id;
+        $restaurant_id = session('current_restaurant_id');
 
         // Generate base slug
         $baseSlug = Str::slug($request->name);

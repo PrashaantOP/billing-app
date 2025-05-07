@@ -12,11 +12,13 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $menuItems = MenuItem::where('restaurant_id', Auth::user()->restaurant_id)->with('category')
+        $currentRestaurantId = session('current_restaurant_id');
+
+        $menuItems = MenuItem::where('restaurant_id', $currentRestaurantId)->with('category')
             ->latest()
             ->paginate(10);
 
-        $categories = Category::where('restaurant_id', Auth::user()->restaurant_id)->get();
+        $categories = Category::where('restaurant_id', session('current_restaurant_id'))->get();
         // dd($categories);
 
         return Inertia::render('backend/menuItems/mainMenuItems', [
@@ -43,7 +45,7 @@ class ProductController extends Controller
             $image->move(public_path('assets/images/menuitems'), $imageName);
             $validated['image'] = $imageName;
         }
-        $validated['restaurant_id'] = Auth::user()->restaurant_id;
+        $validated['restaurant_id'] = session('current_restaurant_id');
 
         MenuItem::create($validated);
 

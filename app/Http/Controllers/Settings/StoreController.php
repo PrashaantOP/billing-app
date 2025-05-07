@@ -15,7 +15,7 @@ class StoreController extends Controller
 {
     public function edit(Request $request): Response
     {
-        $store = $request->user()->restaurant;
+        $store = session('switched_restaurant');
 
         return Inertia::render('settings/storeEdit', [
             'store' => $store,
@@ -32,7 +32,7 @@ class StoreController extends Controller
             'store_gst_no' => 'nullable|string|max:50',
         ]);
 
-        $rastaurant = $request->user()->restaurant;
+        $rastaurant = session('switched_restaurant');
 
         $rastaurant->update([
             'name' => $request->store_name,

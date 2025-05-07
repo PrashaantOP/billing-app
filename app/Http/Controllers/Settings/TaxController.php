@@ -13,7 +13,7 @@ class TaxController extends Controller
 {
     public function index()
     {
-        $taxes = Tax::where('restaurant_id', Auth::user()->restaurant_id)->orderBy('created_at', 'desc')->get();
+        $taxes = Tax::where('restaurant_id', session('current_restaurant_id'))->orderBy('created_at', 'desc')->get();
 
         return Inertia::render('settings/taxes/taxes', [
             'taxes' => $taxes,
@@ -31,7 +31,7 @@ class TaxController extends Controller
                 'string',
                 'max:255',
                 Rule::unique('taxes')->where(function ($query) use ($request) {
-                    return $query->where('restaurant_id', Auth::user()->restaurant_id);
+                    return $query->where('restaurant_id', session('current_restaurant_id'));
                 }),
             ],
             'rate' => ['required', 'numeric', 'min:0'],
@@ -42,7 +42,7 @@ class TaxController extends Controller
         // $validated['restaurant_id'] = Auth::user()->restaurant_id;
 
         Tax::create([
-            'restaurant_id' => Auth::user()->restaurant_id,
+            'restaurant_id' => session('current_restaurant_id'),
             'name' => $validated['name'],
             'rate' => $validated['rate'],
             'rate_type' => $validated['rate_type'],

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
+use App\Models\RestaurantUser;
 use App\Models\User;
 use App\Models\Store;
 use Illuminate\Auth\Events\Registered;
@@ -11,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -51,9 +53,19 @@ class RegisteredUserController extends Controller
             'role' => 'admin',
         ]);
 
+        RestaurantUser::create([
+            'user_id' => $user->id,
+            'restaurant_id' => $restaurant->id,
+            'role' => 'admin',
+            'is_active' => true,
+        ]);
+
         event(new Registered($user));
 
         Auth::login($user);
+
+        // Set session for current restaurant
+        Session::put('current_restaurant_id', $restaurant->id);
 
         return to_route('dashboard');
     }

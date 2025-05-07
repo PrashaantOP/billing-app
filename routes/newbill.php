@@ -11,8 +11,8 @@ use App\Models\Category;
 Route::middleware('auth')->group(function () {
 
     Route::get('newbill', function () {
-        $restaurant = Auth::user()->restaurant;
-        $singleCategory = Category::where('restaurant_id', $restaurant->id)->first();
+        $restaurant_id = session('current_restaurant_id');
+        $singleCategory = Category::where('restaurant_id', $restaurant_id)->first();
 
         if ($singleCategory) {
             return redirect('newbill/menu/' . $singleCategory->slug);

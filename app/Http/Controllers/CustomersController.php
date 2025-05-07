@@ -11,7 +11,7 @@ class CustomersController extends Controller
 {
     public function index()
     {
-        $customers = Customer::where('restaurant_id', Auth::user()->restaurant_id)
+        $customers = Customer::where('restaurant_id', session('current_restaurant_id'))
             ->latest()
             ->paginate(10); // Show 10 per page
 
@@ -30,7 +30,7 @@ class CustomersController extends Controller
         ]);
 
         Customer::create([
-            'restaurant_id' => Auth::user()->restaurant_id,
+            'restaurant_id' => session('current_restaurant_id'),
             'name' => $request->name,
             'phone' => $request->phone,
             'email' => $request->email,

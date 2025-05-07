@@ -10,7 +10,10 @@ class Restaurant extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class)
+            ->using(\App\Models\RestaurantUser::class)
+            ->withPivot(['role', 'is_active'])
+            ->withTimestamps();
     }
 
     public function diningTables()

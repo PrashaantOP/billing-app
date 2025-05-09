@@ -47,7 +47,7 @@ export default function Customers({ categories }: Props) {
         <Heading title="Our Customers" description="Manage our customers" />
         </div>
         <div className='w-1/2 flex justify-end'>
-        <AddNewCategory />
+        <AddNewCategory varient={'destructive'} size={'sm'} />
         </div>
 
       </div>

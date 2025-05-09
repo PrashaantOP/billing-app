@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch'; // <-- for status toggle
 import toast from 'react-hot-toast';
+import AddNewCategory from '../categories/addCategory';
 
 type Category = {
     id: number;
@@ -71,9 +72,10 @@ export default function NewMenuItem({ categories }: { categories: Category[] }) 
             <DialogContent>
                 <DialogTitle>Add New Menu Item</DialogTitle>
                 <DialogDescription>Fill in the details to add a new menu item.</DialogDescription>
-
+                <AddNewCategory varient={'link'} size={'nopd'} />
                 <form onSubmit={submitMenuItem} className="space-y-4">
                     {/* Category selection - moved to top */}
+                    
                     <div>
                         <Label htmlFor="category">Category</Label>
                         <select

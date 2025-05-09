@@ -17,7 +17,12 @@ import {
 } from '@/components/ui/dialog';
 import toast from 'react-hot-toast';
 
-export default function AddNewCategory() {
+type addbtnprop = {
+    varient: string;
+    size: string;
+}
+
+export default function AddNewCategory({varient, size}: addbtnprop) {
     const [open, setOpen] = useState(false);
     const { data, setData, post, processing, reset, errors, clearErrors } = useForm({
         name: '',
@@ -51,7 +56,7 @@ export default function AddNewCategory() {
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="destructive" onClick={() => setOpen(true)}>New Category</Button>
+                    <Button variant={varient} size={size} onClick={() => setOpen(true)}>New Category</Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogTitle>Add New Cagegory</DialogTitle>

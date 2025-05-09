@@ -23,7 +23,7 @@ class CreateNewBillController extends Controller
 
         $singleCategory = category::where('restaurant_id', $restaurant_id)->first();
         if (!$singleCategory) {
-            return response()->json(['message' => 'Category not found'], 404);
+            return redirect()->route('menu.item.view');
         }
 
         $menuItems = MenuItem::where('category_id', $singleCategory->id)
@@ -54,7 +54,7 @@ class CreateNewBillController extends Controller
         // dd($taxes);
 
         if (!$singleCategory) {
-            return response()->json(['message' => 'Category not found'], 404);
+            return redirect()->route('menu.item.view');
         }
 
         $menuItems = MenuItem::where('category_id', $singleCategory->id)

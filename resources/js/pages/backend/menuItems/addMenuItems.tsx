@@ -24,7 +24,7 @@ type Category = {
     name: string;
 };
 
-export default function NewMenuItem({ categories }: { categories: Category[] }) {
+export default function NewMenuItem({ categories, varient, size, }: { categories: Category[]; varient: string; size: string; }) {
     const [open, setOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -67,7 +67,7 @@ export default function NewMenuItem({ categories }: { categories: Category[] }) 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="destructive">New Item</Button>
+                <Button variant={varient} size={size}>New Item</Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogTitle>Add New Menu Item</DialogTitle>

@@ -61,7 +61,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Restaurant Settings',
-        href: '/restaurant',
+        href: '/restaurants/view',
         icon: Store,
     },
     {

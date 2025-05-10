@@ -80,7 +80,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('restaurant_id');
             $table->string('name');
-            $table->string('slug')->unique();
+            $table->string('slug');
             $table->timestamps();
 
             $table->foreign('restaurant_id')->references('id')->on('restaurants');

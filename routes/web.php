@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\DiningTableController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\Settings\RestaurantSwitchController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -48,6 +49,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // dining tables
     Route::get('/dining-tables', [DiningTableController::class, 'index'])->name('dining.tables.index');
+
+    // routes/web.php
+    Route::get('/restaurants/view', [RestaurantController::class, 'index'])->name('restaurants.index');
 });
 
 require __DIR__ . '/settings.php';

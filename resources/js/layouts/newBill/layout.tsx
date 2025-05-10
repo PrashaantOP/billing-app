@@ -2,6 +2,7 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import AddNewCategory from '@/pages/backend/categories/addCategory';
 import { Input } from '@headlessui/react';
 // import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
@@ -35,7 +36,10 @@ export default function NewBillLayout({ children, categories }: NewBillLayoutPro
 
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
             <aside className="w-full max-w-xl lg:w-48">
-            {/* Search Box */}
+            
+            {/* <div className='mb-4'>
+                <AddNewCategory varient='link' size='nopd' />
+            </div> */}
             <div className="mb-4 px-2 flex flex-row items-center justify-start gap-1 rounded-md bg-white border border-gray-300">
                 <Search className="h-4 w-4 text-gray-400" />
                 <Input

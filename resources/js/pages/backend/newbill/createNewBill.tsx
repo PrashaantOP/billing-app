@@ -10,6 +10,7 @@ import {  Check, HandCoins, Landmark, Minus, Plus, Printer,  ShoppingCart, Split
 import { motion, AnimatePresence } from 'framer-motion';
 import EditTaxes from '@/pages/settings/taxes/editTaxes';
 import AddNewTax from '@/pages/settings/taxes/addTaxes';
+import NewMenuItem from '../menuItems/addMenuItems';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -182,6 +183,7 @@ const totalTax = taxes.reduce((sum, tax) => {
                 <div className="flex flex-row items-center justify-start gap-2 ">
                 <div className="space-y-6">
                     <HeadingSmall title={categoryname} description="Create new order and print" />
+                    <div><NewMenuItem categories={categories} varient='link' size='nopd' /></div>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {menuitems.length > 0 ? (
                         menuitems.map((item) => {
@@ -198,7 +200,7 @@ const totalTax = taxes.reduce((sum, tax) => {
                                     <img
                                         src={`/assets/images/menuitems/${item.image ? item.image : 'food-default.png'}`}
                                         alt={item.name}
-                                        className="w-full h-32 object-cover mb-2"
+                                        className="w-full h-32 object-cover mb-2 aspect-square rounded-md"
                                     />
                                     {isSelected && item.is_available && (
                                         <div className="absolute top-0 left-0 w-full h-full bg-green-600/30 bg-opacity-50 flex items-center justify-center text-white text-sm font-medium rounded-md">
@@ -221,7 +223,7 @@ const totalTax = taxes.reduce((sum, tax) => {
                             );
                         })
                     ) : (
-                        <div className="text-center text-gray-500 p-6 whitespace-nowrap">No items available.</div>
+                        <div className="text-center text-gray-500 p-6 whitespace-nowrap">No items available. </div>
                     )}
 
                     </div>
@@ -292,7 +294,7 @@ const totalTax = taxes.reduce((sum, tax) => {
 </li>
 
                             {/* Payment Status Selection */}
-                            <li className='text-black font-bold'>Payment Details</li>
+                            <li className='text-dark font-bold'>Payment Details</li>
     <li className="flex flex-wrap gap-2 pt-2">
       <button
         onClick={() => { setPaymentStatus('paid'); setPaymentMethod(''); setTransactionId(''); }}
@@ -367,7 +369,7 @@ const totalTax = taxes.reduce((sum, tax) => {
     )}
     {/* <li className='text-black font-bold mb-5 mt-10'>Customer Details</li> */}
     <li className="py-4 border-t">
-      <h6 className="text-black font-bold my-3">Customer Details</h6>
+      <h6 className="text-dark font-bold my-3">Customer Details</h6>
 
       {/* Customer Phone */}
       <label htmlFor="phone_number" className='text-xs'>Phone Number</label>

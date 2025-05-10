@@ -66,6 +66,7 @@ class RegisteredUserController extends Controller
 
         // Set session for current restaurant
         Session::put('current_restaurant_id', $restaurant->id);
+        Session::put('switched_restaurant', $restaurant);
 
         return to_route('dashboard');
     }

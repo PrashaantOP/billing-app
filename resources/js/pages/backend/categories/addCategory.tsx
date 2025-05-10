@@ -59,7 +59,7 @@ export default function AddNewCategory({varient, size}: addbtnprop) {
                     <Button variant={varient} size={size} onClick={() => setOpen(true)}>New Category</Button>
                 </DialogTrigger>
                 <DialogContent>
-                    <DialogTitle>Add New Cagegory</DialogTitle>
+                    <DialogTitle>Add New Category</DialogTitle>
                     <DialogDescription>Fill in the input to add a new category.</DialogDescription>
 
                     <form onSubmit={submitCustomer} className="space-y-4">

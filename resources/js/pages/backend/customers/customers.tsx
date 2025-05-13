@@ -5,6 +5,7 @@ import { Head, router } from '@inertiajs/react';
 import NewCustomer from './newCustomer';
 import EditCustomer from './editCustomer';
 import DeleteCustomerButton from './deleteCustomer';
+import SearchAddUpdateSelectCustomer from './searchAddUpdateCustomer';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -50,7 +51,8 @@ export default function Customers({ customers }: Props) {
         <Heading title="Our Customers" description="Manage our customers" />
         </div>
         <div className='w-1/2 flex justify-end'>
-        <NewCustomer />
+        {/* <NewCustomer /> */}
+        <SearchAddUpdateSelectCustomer />
         </div>
 
       </div>

@@ -46,7 +46,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
-                'restaurants' => $request->user()?->restaurants()->select('restaurants.id', 'restaurants.name')->get() ?? [],
+                'restaurants' => $request->user()?->restaurants()->select('restaurants.id', 'restaurants.name', 'restaurants.address')->get() ?? [],
                 'current_restaurant_id' => Session::get('current_restaurant_id'),
             ],
             'ziggy' => fn(): array => [

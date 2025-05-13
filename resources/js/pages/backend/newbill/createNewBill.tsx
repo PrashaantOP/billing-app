@@ -217,7 +217,7 @@ const totalTax = taxes.reduce((sum, tax) => {
                                         </div>
                                     )}
 
-                                    <h3 className="text-lg font-semibold">{item.name}</h3>
+                                    <h3 className="text-lg font-semibold">{item.name.length > 12 ? `${item.name.slice(0, 10)}..` : item.name}</h3>
                                     <p className="text-gray-500">Price: ₹{item.price}</p>
                                 </div>
                             );

@@ -3,7 +3,7 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { type User } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { Gem, LogOut, Settings, Store } from 'lucide-react';
 import { router } from '@inertiajs/react';
 
 interface UserMenuContentProps {
@@ -12,11 +12,11 @@ interface UserMenuContentProps {
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
     const cleanup = useMobileNavigation();
-    const handleClick = (e: React.MouseEvent) => {
+    const handleClick = (e: React.MouseEvent, path: string) => {
         e.preventDefault();
         cleanup();
     
-        router.visit(route('profile.edit'), {
+        router.visit(route(path), {
             preserveScroll: true,
             preserveState: false, // forces fresh data load
         });
@@ -32,7 +32,21 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                <button className="block w-full" onClick={handleClick}>
+                <button className="block w-full" onClick={(e) => handleClick(e, 'plans')}>
+                    <Gem className="mr-2" />
+                    Upgrade to Pro
+                </button>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                <button className="block w-full" onClick={(e) => handleClick(e, 'restaurants.index')}>
+                    <Store className="mr-2" />
+                    Restaurants
+                </button>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                <button className="block w-full" onClick={(e) => handleClick(e, 'profile.edit')}>
                     <Settings className="mr-2" />
                     Settings
                 </button>

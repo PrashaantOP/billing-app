@@ -49,26 +49,26 @@ const mainNavItems: NavItem[] = [
         href: '/payments',
         icon: DollarSign,
     },
-    {
-        title: 'Taxes',
-        href: '/settings/taxes',
-        icon: Percent,
-    },
+    // {
+    //     title: 'Taxes',
+    //     href: '/settings/taxes',
+    //     icon: Percent,
+    // },
     {
         title: 'Logs',
         href: '/logs',
         icon: History,
     },
-    {
-        title: 'Restaurant Settings',
-        href: '/restaurants/view',
-        icon: Store,
-    },
-    {
-        title: 'Plans',
-        href: '/plans',
-        icon: Gem,
-    },
+    // {
+    //     title: 'Restaurant Settings',
+    //     href: '/restaurants/view',
+    //     icon: Store,
+    // },
+    // {
+    //     title: 'Plans',
+    //     href: '/plans',
+    //     icon: Gem,
+    // },
 ];
 
 const companies: CompItem[] = [
@@ -115,7 +115,7 @@ export function AppSidebar() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu> */}
-                <TeamSwitcher teams={companies} />
+                <TeamSwitcher />
             </SidebarHeader>
 
             <SidebarContent>

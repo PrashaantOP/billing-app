@@ -28,6 +28,7 @@ export function TeamSwitcher() {
   const teams = auth.restaurants.map((restaurant: any) => ({
     name: restaurant.name,
     logo: AudioWaveform,
+    address: restaurant.address,
     plan: restaurant.id === auth.current_restaurant_id ? 'Current' : 'Available',
     id: restaurant.id,
   }))
@@ -47,7 +48,12 @@ export function TeamSwitcher() {
         preserveScroll: true,
         // only: ['auth'],
         onStart: () => localStorage.removeItem('selectedItems'),
-        onSuccess: () => resolve(`Switched to ${restaurant_name}!`),
+        onSuccess: () => {
+          resolve(`Switched to ${restaurant_name}!`);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        },
         onError: () => reject('Failed to switch restaurant.'),
       });
     }),
@@ -70,7 +76,7 @@ export function TeamSwitcher() {
             >
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold text-red-600">{activeTeam.name}</span>
-                <span className="truncate text-xs">AIIMS Road walmi</span>
+                <span className="truncate text-xs">{activeTeam.address}</span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>

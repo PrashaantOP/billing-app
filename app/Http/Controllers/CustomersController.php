@@ -20,6 +20,19 @@ class CustomersController extends Controller
         ]);
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->input('phone');
+
+        $customers = Customer::where('phone', 'like', "$query%")
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get(['id', 'name', 'phone', 'email', 'address']);
+
+        return response()->json($customers);
+    }
+
+
     public function store(Request $request)
     {
         $request->validate([
@@ -42,19 +55,37 @@ class CustomersController extends Controller
 
 
 
-    // public function update(Request $request, Customer $customer)
-    // {
-    //     $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'phone' => 'nullable|string',
-    //         'email' => 'nullable|email',
-    //         'address' => 'nullable|string',
-    //     ]);
+    public function storeOrUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'phone'   => 'required|string|max:15',
+            'name'    => 'nullable|string|max:255',
+            'email'   => 'nullable|email|max:255',
+            'address' => 'nullable|string|max:500',
+        ]);
 
-    //     $customer->update($request->only('name', 'phone', 'email', 'address'));
+        // Check if customer with phone exists
+        $customer = Customer::where('phone', $validated['phone'])->first();
 
-    //     return redirect()->back()->with('success', 'Customer updated.');
-    // }
+        if ($customer) {
+            // Update customer if additional fields are provided
+            $customer->update([
+                'name'    => $validated['name'] ?? $customer->name,
+                'email'   => $validated['email'] ?? $customer->email,
+                'address' => $validated['address'] ?? $customer->address,
+            ]);
+        } else {
+            // Create new customer
+            $validated['restaurant_id'] = session('current_restaurant_id');
+            $customer = Customer::create($validated);
+        }
+
+        return response()->json([
+            'message' => 'Customer saved successfully.',
+            'customer_id' => $customer->id,
+            'customer' => $customer,
+        ]);
+    }
 
     public function update(Request $request)
     {

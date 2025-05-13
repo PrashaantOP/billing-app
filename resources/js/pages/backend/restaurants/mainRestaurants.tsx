@@ -1,7 +1,8 @@
 import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import {  Pencil } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -87,7 +88,13 @@ export default function RestaurantsMain({ restaurants, current_restaurant_id }: 
           <td className="px-4 py-4 text-end text-sm font-medium">
             <div className="flex gap-x-3 justify-end">
               <button className="text-gray-600 hover:text-gray-800 dark:text-gray-500 dark:hover:text-gray-400">
-                {/* <EditCustomer key={customer.id + '-' + customer.updated_at} customer={customer} /> */}
+                {restaurant.id === current_restaurant_id ? (
+              <Link href="/settings/store" className="text-gray-600 hover:text-gray-800 dark:text-gray-500 dark:hover:text-gray-400">
+                <Pencil className="w-4 h-4 mr-1" />
+              </Link>
+            ) : (
+              <span className="text-gray-400">—</span>
+            )}
               </button>
               {/* <button className="text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400">
                 // <DeleteCustomerButton id={customer.id} />

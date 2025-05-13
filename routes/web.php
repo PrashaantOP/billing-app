@@ -31,9 +31,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // customers
     Route::get('customers/view', [CustomersController::class, 'index'])->name('customers.view');
-    Route::post('/customers', [CustomersController::class, 'store'])->name('customers.store');
+    // Route::post('/customers', [CustomersController::class, 'store'])->name('customers.store');
+    Route::post('/customers/store', [CustomersController::class, 'storeOrUpdate'])->name('customers.store');
     Route::patch('/customers/update', [CustomersController::class, 'update'])->name('customers.update');
     Route::delete('/customer/destroy/{id}', [CustomersController::class, 'destroy'])->name('customer.destroy');
+    Route::get('/customers/search', [CustomersController::class, 'search'])->name('customers.search');
+
 
     // categories
     Route::get('menu/categories', [CategoryController::class, 'index'])->name('categories.view');

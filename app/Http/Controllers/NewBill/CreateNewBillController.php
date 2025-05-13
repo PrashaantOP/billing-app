@@ -13,36 +13,36 @@ use Inertia\Inertia;
 
 class CreateNewBillController extends Controller
 {
-    public function newBillShow()
-    {
-        $restaurant_id = session('current_restaurant_id');
-        $categories = category::where('restaurant_id', $restaurant_id)->get();
+    // public function newBillShow()
+    // {
+    //     $restaurant_id = session('current_restaurant_id');
+    //     $categories = category::where('restaurant_id', $restaurant_id)->get();
 
-        // taxes
-        $taxes = Tax::where('restaurant_id', $restaurant_id)->where('is_inclusive', 1)->get();
+    //     // taxes
+    //     $taxes = Tax::where('restaurant_id', $restaurant_id)->where('is_inclusive', 1)->get();
 
-        $singleCategory = category::where('restaurant_id', $restaurant_id)->first();
-        if (!$singleCategory) {
-            return redirect()->route('menu.item.view');
-        }
+    //     $singleCategory = category::where('restaurant_id', $restaurant_id)->first();
+    //     if (!$singleCategory) {
+    //         return redirect()->route('menu.item.view');
+    //     }
 
-        $menuItems = MenuItem::where('category_id', $singleCategory->id)
-            // ->with(['restaurant', 'category'])
-            ->get();
-        return Inertia::render('backend/newbill/createNewBill', [
-            'categories' => $categories,
-            'menuitems' => $menuItems,
-            'taxes' => $taxes,
-            'categoryname' => $singleCategory->name,
-        ]);
-    }
+    //     $menuItems = MenuItem::where('category_id', $singleCategory->id)
+    //         // ->with(['restaurant', 'category'])
+    //         ->get();
+    //     return Inertia::render('backend/newbill/createNewBill', [
+    //         'categories' => $categories,
+    //         'menuitems' => $menuItems,
+    //         'taxes' => $taxes,
+    //         'categoryname' => $singleCategory->name,
+    //     ]);
+    // }
 
     public function getItemUsingSlug($slug)
     {
         $restaurant_id = session('current_restaurant_id');
         $categories = category::where('restaurant_id', $restaurant_id)->get();
         if (!$categories) {
-            return Inertia::location(route('taxes.index'));
+            return redirect()->route('menu.item.view');
         }
         $taxes = Tax::where('restaurant_id', $restaurant_id)
             ->where('is_inclusive', true)
@@ -57,7 +57,7 @@ class CreateNewBillController extends Controller
             return redirect()->route('menu.item.view');
         }
 
-        $menuItems = MenuItem::where('category_id', $singleCategory->id)
+        $menuItems = MenuItem::where('category_id', $singleCategory->id)->where('restaurant_id', $restaurant_id)
             // ->with(['restaurant', 'category'])
             ->get();
 

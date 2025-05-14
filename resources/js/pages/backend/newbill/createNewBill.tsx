@@ -98,7 +98,7 @@ useEffect(() => {
         setBillCounter(2);
     } else if (bills.length === 1) {
         setActiveBillId(bills[0].id);
-    } 
+    }
 }, [bills]);
 
 
@@ -136,12 +136,12 @@ const handleSelect = (item: MenuItemType) => {
   setBills(prevBills =>
     prevBills.map(bill => {
       if (bill.id !== activeBillId) return bill;
-        
+
       const exists = bill.items.find(i => i.id === item.id);
       const updatedItems = exists
         ? bill.items.filter(i => i.id !== item.id)
         : [...bill.items, { ...item, quantity: 1 }];
-        
+
 
       return {
         ...bill,
@@ -263,7 +263,7 @@ const totalWithTax = total + totalTax;
         exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         onClick={() => switchBill(bill.id)}
-        className={`flex items-center rounded-md px-3 py-1 cursor-pointer ${
+        className={`flex items-center rounded-md px-3 py-1 cursor-default ${
           bill.id === activeBillId
             ? 'bg-white text-black shadow'
             : 'bg-gray-100 text-black hover:bg-gray-200'
@@ -275,7 +275,7 @@ const totalWithTax = total + totalTax;
             e.stopPropagation();
             removeBill(bill.id);
           }}
-          className="ml-1 text-sm hover:text-red-600"
+          className="ml-1 text-sm hover:text-red-600 cursor-pointer"
         >
           <X className="w-3 h-3" />
         </button>
@@ -514,39 +514,9 @@ const totalWithTax = total + totalTax;
       </li>
     )}
     {/* <li className='text-black font-bold mb-5 mt-10'>Customer Details</li> */}
-    <li className="py-4 border-t">
+    {/* <li className="py-4 border-t">
       <h6 className="text-dark font-bold my-3">Customer Details</h6>
-
-      {/* Customer Phone */}
-      <label htmlFor="phone_number" className='text-xs'>Phone Number</label>
-      <input
-        type="text"
-        value={customerPhone}
-        onChange={(e) => setCustomerPhone(e.target.value)}
-        className="w-full mb-2 px-3 py-2 border rounded-md"
-        placeholder="Phone Number"
-      />
-
-      {/* Customer Name */}
-      <label htmlFor="customer_name" className='text-xs'>Customer Name</label>
-      <input
-        type="text"
-        value={customerName}
-        onChange={(e) => setCustomerName(e.target.value)}
-        className="w-full mb-2 px-3 py-2 border rounded-md"
-        placeholder="Customer Name"
-      />
-
-      {/* Customer Address */}
-      <label htmlFor="address" className='text-xs'>Address</label>
-      <textarea
-        value={customerAddress}
-        onChange={(e) => setCustomerAddress(e.target.value)}
-        className="w-full mb-2 px-3 py-2 border rounded-md"
-        placeholder="Address"
-        rows={2}
-      />
-    </li>
+    </li> */}
                             </ul>
                         ) : (
                             <p className="text-gray-400 mt-10 text-center">No items selected.</p>

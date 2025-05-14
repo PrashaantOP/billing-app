@@ -12,6 +12,7 @@ import EditTaxes from '@/pages/settings/taxes/editTaxes';
 import AddNewTax from '@/pages/settings/taxes/addTaxes';
 import NewMenuItem from '../menuItems/addMenuItems';
 
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Create new order',
@@ -59,16 +60,21 @@ type CreateNewBillProps = {
     }[];
 }
 
+type Bill = {
+    id: number;
+    name: string;
+    items: MenuItemType[];
+};
+
 
 export default function CreateNewBill({ categories, menuitems, categoryname, taxes }: CreateNewBillProps) {
 
 
-   // right side cart work starts here
+// right side cart work starts here
 
-   const [cartOpen, setCartOpen] = useState(false);
-const [selectedItems, setSelectedItems] = useState<MenuItemType[]>([]);
+const [cartOpen, setCartOpen] = useState(false);
 
-// payment status
+// Payment details (optional: can be per bill if needed)
 const [paymentStatus, setPaymentStatus] = useState('');
 const [paymentMethod, setPaymentMethod] = useState('');
 const [transactionId, setTransactionId] = useState('');
@@ -79,107 +85,247 @@ const [customerAddress, setCustomerAddress] = useState('');
 
 
 
-const handleSelect = (item: MenuItemType) => {
-    setSelectedItems((prevItems) => {
-        const exists = prevItems.find(i => i.id === item.id);
+// Tabs / Bills
+const [bills, setBills] = useState<Bill[]>([]);
+const [activeBillId, setActiveBillId] = useState<number | null>(null);
+const [billCounter, setBillCounter] = useState(1);
+// console.log(activeBillId);
+useEffect(() => {
+    if (bills.length === 0) {
+        const defaultBill = { id: Date.now(), name: 'Bill 1', items: [] };
+        setBills([defaultBill]);
+        setActiveBillId(defaultBill.id);
+        setBillCounter(2);
+    } else if (bills.length === 1) {
+        setActiveBillId(bills[0].id);
+    } 
+}, [bills]);
 
-        const updatedItems = exists
-            ? prevItems.filter(i => i.id !== item.id)
-            : [...prevItems, { ...item, quantity: 1 }]; // Add quantity on new item
 
-        localStorage.setItem('selectedItems', JSON.stringify(updatedItems));
-        return updatedItems;
-    });
+const addNewBill = () => {
+    const newId = Date.now();
+    const newBill = { id: newId, name: `Bill ${billCounter}`, items: [] };
+    setBills(prev => [...prev, newBill]);
+    setActiveBillId(newId);
+    setBillCounter(prev => prev + 1);
 };
 
+const switchBill = (id: number) => {
+    setActiveBillId(id);
+};
 
+const removeBill = (id: number) => {
+    setBills(prev => {
+        const updated = prev.filter(b => b.id !== id);
+        if (id === activeBillId) {
+            const last = updated[updated.length - 1];
+            setActiveBillId(last ? last.id : null);
+        }
+        return updated;
+    });
+};
+// console.log(bills);
+
+const activeBill = bills.find(bill => bill.id === activeBillId);
+
+// ==========================
+// Item Actions (per bill)
+// ==========================
+
+const handleSelect = (item: MenuItemType) => {
+  setBills(prevBills =>
+    prevBills.map(bill => {
+      if (bill.id !== activeBillId) return bill;
+        
+      const exists = bill.items.find(i => i.id === item.id);
+      const updatedItems = exists
+        ? bill.items.filter(i => i.id !== item.id)
+        : [...bill.items, { ...item, quantity: 1 }];
+        
+
+      return {
+        ...bill,
+        items: updatedItems,
+      };
+    })
+  );
+};
 
 const increaseQty = (id: number) => {
-    setSelectedItems(items => {
-        const updated = items.map(i =>
-            i.id === id ? { ...i, quantity: (i.quantity || 1) + 1 } : i
-        );
-        localStorage.setItem('selectedItems', JSON.stringify(updated));
-        return updated;
-    });
-};
+  setBills(prevBills =>
+    prevBills.map(bill => {
+      if (bill.id !== activeBillId) return bill;
 
-// const decreaseQty = (id: number) => {
-//     setSelectedItems(items => {
-//         const updated = items.map(i =>
-//             i.id === id && (i.quantity || 1) > 1 ? { ...i, quantity: (i.quantity || 1) - 1 } : i
-//         );
-//         localStorage.setItem('selectedItems', JSON.stringify(updated));
-//         return updated;
-//     });
-// };
+      const updatedItems = bill.items.map(i =>
+        i.id === id ? { ...i, quantity: (i.quantity || 1) + 1 } : i
+      );
+
+      return {
+        ...bill,
+        items: updatedItems,
+      };
+    })
+  );
+};
 
 const decreaseQty = (id: number) => {
-    setSelectedItems(items => {
-        const updated = items.reduce((acc, i) => {
-            if (i.id === id) {
-                if ((i.quantity || 1) > 1) {
-                    acc.push({ ...i, quantity: (i.quantity || 1) - 1 });
-                }
-                // else don't push = remove item
-            } else {
-                acc.push(i);
-            }
-            return acc;
-        }, [] as typeof items);
-        localStorage.setItem('selectedItems', JSON.stringify(updated));
-        return updated;
-    });
+  setBills(prevBills =>
+    prevBills.map(bill => {
+      if (bill.id !== activeBillId) return bill;
+
+      const updatedItems = bill.items.reduce<MenuItemType[]>((acc, i) => {
+        if (i.id === id) {
+          if ((i.quantity || 1) > 1) {
+            acc.push({ ...i, quantity: (i.quantity || 1) - 1 });
+          }
+          // else don't push = remove item
+        } else {
+          acc.push(i);
+        }
+        return acc;
+      }, []);
+
+      return {
+        ...bill,
+        items: updatedItems,
+      };
+    })
+  );
 };
 
-
-// const removeItem = (id: number) => {
-//     setSelectedItems(items => {
-//         const updated = items.filter(i => i.id !== id);
-//         localStorage.setItem('selectedItems', JSON.stringify(updated));
-//         return updated;
-//     });
-// };
-
-
-
+// ==========================
+// useEffect: Load bills from localStorage (optional)
+// ==========================
 useEffect(() => {
-    const stored = localStorage.getItem('selectedItems');
-    if (stored) {
-        setSelectedItems(JSON.parse(stored));
+  const storedBills = localStorage.getItem('bills');
+  const storedActiveBillId = localStorage.getItem('activeBillId');
+
+  if (storedBills) {
+    const parsedBills = JSON.parse(storedBills);
+    setBills(parsedBills);
+
+    if (storedActiveBillId) {
+      setActiveBillId(parseInt(storedActiveBillId));
+    } else if (parsedBills.length > 0) {
+      setActiveBillId(parsedBills[parsedBills.length - 1].id); // fallback to last bill
     }
+  } else {
+    // First-time visit: add default bill
+    const defaultBill = { id: Date.now(), name: 'Bill 1', items: [] };
+    setBills([defaultBill]);
+    setActiveBillId(defaultBill.id);
+    setBillCounter(2);
+  }
 }, []);
 
-// useEffect(() => {
-//     setCartOpen(true);
-//     console.log('Selected items:', selectedItems);
-// }, [selectedItems]);
+// Save bills to localStorage
+useEffect(() => {
+  localStorage.setItem('bills', JSON.stringify(bills));
+}, [bills]);
+
+// Save active tab to localStorage
+useEffect(() => {
+  if (activeBillId !== null) {
+    localStorage.setItem('activeBillId', activeBillId.toString());
+  }
+}, [activeBillId]);
+
+// ==========================
+// Calculations for Active Bill
+// ==========================
+
+const selectedItems = activeBill?.items || [];
 
 const total = selectedItems.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0);
 const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
 
-// total with tax
-
-
 const totalTax = taxes.reduce((sum, tax) => {
-    const rate = parseFloat(tax.rate);
-    return sum + (tax.rate_type === 'percent' ? (total * rate) / 100 : rate);
+  const rate = parseFloat(tax.rate);
+  return sum + (tax.rate_type === 'percent' ? (total * rate) / 100 : rate);
 }, 0);
 
-// console.log(totalTax);
+const totalWithTax = total + totalTax;
 
-  const totalWithTax = total + totalTax;
-//   console.log(totalTax);
-
-
-
- //   right side cart work ends here
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create new order" />
 
             <NewBillLayout categories={categories}>
+                {/* new tab start  */}
+<div className="flex gap-2 mb-4 flex-wrap bg-gray-100 p-1 rounded-md w-fit">
+  <AnimatePresence initial={false}>
+    {bills.map((bill) => (
+      <motion.div
+        key={bill.id}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        onClick={() => switchBill(bill.id)}
+        className={`flex items-center rounded-md px-3 py-1 cursor-pointer ${
+          bill.id === activeBillId
+            ? 'bg-white text-black shadow'
+            : 'bg-gray-100 text-black hover:bg-gray-200'
+        }`}
+      >
+        <span className="text-red font-bold mr-2">{bill.name}</span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            removeBill(bill.id);
+          }}
+          className="ml-1 text-sm hover:text-red-600"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      </motion.div>
+    ))}
+  </AnimatePresence>
+
+  <motion.button
+    whileTap={{ scale: 0.9 }}
+    whileHover={{ scale: 1.05 }}
+    onClick={addNewBill}
+    className="px-3 py-1 rounded text-black hover:bg-gray-200 font-bold"
+  >
+    +
+  </motion.button>
+</div>
+
+                {/* <div className="flex gap-2 mb-4 flex-wrap bg-gray-100 p-1 rounded-md">
+  {bills.map(bill => (
+    <div
+      key={bill.id}
+      className={`flex items-center rounded-md px-3 py-1 ${
+        bill.id === activeBillId ? 'bg-white text-black' : 'bg-gray-100 text-black'
+      }`}
+    >
+      <button onClick={() => switchBill(bill.id)} className="mr-2 font-semibold">
+        {bill.name}
+      </button>
+      {bills.length > 1 && (
+        <button
+          onClick={() => removeBill(bill.id)}
+          className="ml-1 text-sm hover:text-red-600 "
+        >
+            <X className={`w-3 h-3 `} />
+        </button>
+      )}
+    </div>
+  ))}
+
+  <button
+    onClick={addNewBill}
+    className="px-3 py-1 rounded text-black hover:bg-gray-200 font-bold"
+  >
+    ＋
+  </button>
+</div> */}
+
+
+
+                {/* new tab end  */}
                 <div className="flex flex-row items-center justify-start gap-2 ">
                 <div className="space-y-6">
                     <HeadingSmall title={categoryname} description="Create new order and print" />
@@ -300,12 +446,12 @@ const totalTax = taxes.reduce((sum, tax) => {
         onClick={() => { setPaymentStatus('paid'); setPaymentMethod(''); setTransactionId(''); }}
         className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'paid' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-banknote-arrow-up-icon lucide-banknote-arrow-up"><path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="M18 12h.01"/><path d="M19 22v-6"/><path d="m22 19-3-3-3 3"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>Paid
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-banknote-arrow-up-icon lucide-banknote-arrow-up"><path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="M18 12h.01"/><path d="M19 22v-6"/><path d="m22 19-3-3-3 3"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>Paid
       </button>
       <button
         onClick={() => { setPaymentStatus('pending'); setPaymentMethod(''); setTransactionId(''); }}
         className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
-      ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-banknote-x-icon lucide-banknote-x"><path d="M13 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="m17 17 5 5"/><path d="M18 12h.01"/><path d="m22 17-5 5"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>
+      ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-banknote-x-icon lucide-banknote-x"><path d="M13 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="m17 17 5 5"/><path d="M18 12h.01"/><path d="m22 17-5 5"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>
         Pending
       </button>
       <button

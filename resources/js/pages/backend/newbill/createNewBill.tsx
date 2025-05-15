@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import EditTaxes from '@/pages/settings/taxes/editTaxes';
 import AddNewTax from '@/pages/settings/taxes/addTaxes';
 import NewMenuItem from '../menuItems/addMenuItems';
+import SearchAddUpdateSelectCustomer from '../customers/searchAddUpdateCustomer';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -64,6 +65,10 @@ type Bill = {
     id: number;
     name: string;
     items: MenuItemType[];
+    customer?: {
+      name: string;
+      phone: string;
+    };
 };
 
 
@@ -79,16 +84,19 @@ const [paymentStatus, setPaymentStatus] = useState('');
 const [paymentMethod, setPaymentMethod] = useState('');
 const [transactionId, setTransactionId] = useState('');
 const [partialAmount, setPartialAmount] = useState('');
-const [customerName, setCustomerName] = useState('');
-const [customerPhone, setCustomerPhone] = useState('');
-const [customerAddress, setCustomerAddress] = useState('');
+// const [customerName, setCustomerName] = useState('');
+// const [customerPhone, setCustomerPhone] = useState('');
+// const [customerAddress, setCustomerAddress] = useState('');
 
 
 
 // Tabs / Bills
 const [bills, setBills] = useState<Bill[]>([]);
 const [activeBillId, setActiveBillId] = useState<number | null>(null);
-const [billCounter, setBillCounter] = useState(1);
+const [billCounter, setBillCounter] = useState(() => {
+  const storedCounter = localStorage.getItem('billCounter');
+  return storedCounter ? parseInt(storedCounter) : 1;
+});
 // console.log(activeBillId);
 useEffect(() => {
     if (bills.length === 0) {
@@ -199,6 +207,11 @@ const decreaseQty = (id: number) => {
 useEffect(() => {
   const storedBills = localStorage.getItem('bills');
   const storedActiveBillId = localStorage.getItem('activeBillId');
+  const storedCounter = localStorage.getItem('billCounter');
+
+  if (storedCounter) {
+    setBillCounter(parseInt(storedCounter));
+  }
 
   if (storedBills) {
     const parsedBills = JSON.parse(storedBills);
@@ -228,8 +241,36 @@ useEffect(() => {
   if (activeBillId !== null) {
     localStorage.setItem('activeBillId', activeBillId.toString());
   }
+  const updateCustomerFromStorage = () => {
+        const storedCustomer = localStorage.getItem('billCustomer');
+        if (!storedCustomer) return;
+
+        const customer = JSON.parse(storedCustomer);
+
+        setBills(prevBills =>
+            prevBills.map(bill =>
+                bill.id === activeBillId
+                    ? { ...bill, customer }
+                    : bill
+            )
+        );
+
+        // Clear after use
+        localStorage.removeItem('billCustomer');
+    };
+
+    // Listen to custom event
+    window.addEventListener('bill-customer-updated', updateCustomerFromStorage);
+
+    // Clean up
+    return () => {
+        window.removeEventListener('bill-customer-updated', updateCustomerFromStorage);
+    };
 }, [activeBillId]);
 
+useEffect(() => {
+  localStorage.setItem('billCounter', billCounter.toString());
+}, [billCounter]);
 // ==========================
 // Calculations for Active Bill
 // ==========================
@@ -246,6 +287,7 @@ const totalTax = taxes.reduce((sum, tax) => {
 
 const totalWithTax = total + totalTax;
 
+// console.log(activeBill);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -293,35 +335,7 @@ const totalWithTax = total + totalTax;
   </motion.button>
 </div>
 
-                {/* <div className="flex gap-2 mb-4 flex-wrap bg-gray-100 p-1 rounded-md">
-  {bills.map(bill => (
-    <div
-      key={bill.id}
-      className={`flex items-center rounded-md px-3 py-1 ${
-        bill.id === activeBillId ? 'bg-white text-black' : 'bg-gray-100 text-black'
-      }`}
-    >
-      <button onClick={() => switchBill(bill.id)} className="mr-2 font-semibold">
-        {bill.name}
-      </button>
-      {bills.length > 1 && (
-        <button
-          onClick={() => removeBill(bill.id)}
-          className="ml-1 text-sm hover:text-red-600 "
-        >
-            <X className={`w-3 h-3 `} />
-        </button>
-      )}
-    </div>
-  ))}
-
-  <button
-    onClick={addNewBill}
-    className="px-3 py-1 rounded text-black hover:bg-gray-200 font-bold"
-  >
-    ＋
-  </button>
-</div> */}
+               
 
 
 
@@ -444,19 +458,19 @@ const totalWithTax = total + totalTax;
     <li className="flex flex-wrap gap-2 pt-2">
       <button
         onClick={() => { setPaymentStatus('paid'); setPaymentMethod(''); setTransactionId(''); }}
-        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'paid' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'paid' ? 'bg-green-200 text-green-600' : 'bg-gray-200'}`}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-banknote-arrow-up-icon lucide-banknote-arrow-up"><path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="M18 12h.01"/><path d="M19 22v-6"/><path d="m22 19-3-3-3 3"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>Paid
       </button>
       <button
         onClick={() => { setPaymentStatus('pending'); setPaymentMethod(''); setTransactionId(''); }}
-        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
+        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'pending' ? 'bg-yellow-200 text-yellow-600' : 'bg-gray-200'}`}
       ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-banknote-x-icon lucide-banknote-x"><path d="M13 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="m17 17 5 5"/><path d="M18 12h.01"/><path d="m22 17-5 5"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>
         Pending
       </button>
       <button
         onClick={() => { setPaymentStatus('partial'); setPaymentMethod(''); setTransactionId(''); }}
-        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'partial' ? 'bg-orange-500 text-white' : 'bg-gray-200'}`}
+        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'partial' ? 'bg-orange-200 text-orange-600' : 'bg-gray-200'}`}
       ><Split className="w-4 h-4" />
         Partial
       </button>
@@ -467,19 +481,19 @@ const totalWithTax = total + totalTax;
       <li className="flex flex-wrap gap-2 pt-2">
         <button
           onClick={() => setPaymentMethod('cash')}
-          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'cash' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'cash' ? 'bg-green-200 text-green-600' : 'bg-gray-200'}`}
         >
           <HandCoins className='w-4 h-4'/> Cash
         </button>
         <button
           onClick={() => setPaymentMethod('bank')}
-          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'bank' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'bank' ? 'bg-blue-200 text-blue-600' : 'bg-gray-200'}`}
         ><Landmark className='w-4 h-4'/>
           Bank/UPI
         </button>
         <button
           onClick={() => setPaymentMethod('cheque')}
-          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'cheque' ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}
+          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'cheque' ? 'bg-purple-200 text-purple-600' : 'bg-gray-200'}`}
         ><WalletCards className='w-4 h-4'/>
           Cheque
         </button>
@@ -514,9 +528,26 @@ const totalWithTax = total + totalTax;
       </li>
     )}
     {/* <li className='text-black font-bold mb-5 mt-10'>Customer Details</li> */}
-    {/* <li className="py-4 border-t">
+    <li className="pt-4 pb-1 border-t">
       <h6 className="text-dark font-bold my-3">Customer Details</h6>
-    </li> */}
+    </li>
+    <li>
+      <SearchAddUpdateSelectCustomer />
+      {activeBill?.customer ? (
+  <div className="mb-2 p-2 bg-gray-100 rounded">
+    <div className="text-sm font-semibold text-gray-700">Customer</div>
+    <div className="text-sm text-gray-800">
+      {activeBill.customer.name} ({activeBill.customer.phone})
+    </div>
+  </div>
+) : (
+  <div className="mb-2 p-2 bg-gray-50 rounded text-sm text-gray-500">
+    No customer
+  </div>
+)}
+
+
+    </li>
                             </ul>
                         ) : (
                             <p className="text-gray-400 mt-10 text-center">No items selected.</p>

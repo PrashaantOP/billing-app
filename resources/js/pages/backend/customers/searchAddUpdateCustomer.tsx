@@ -18,6 +18,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import toast from 'react-hot-toast';
+import { UserPlus } from 'lucide-react';
 
 export default function SearchAddUpdateSelectCustomer() {
     const [open, setOpen] = useState(false);
@@ -73,6 +74,14 @@ export default function SearchAddUpdateSelectCustomer() {
         post(route('customers.store'), {
             preserveScroll: true,
             onSuccess: () => {
+                localStorage.setItem('billCustomer', JSON.stringify({
+                    name: data.name,
+                    phone: data.phone,
+                }));
+
+                // Optional: trigger custom event
+                window.dispatchEvent(new Event('bill-customer-updated'));
+
                 closeModal();
                 toast.success('Customer details added successfully!');
             },
@@ -83,7 +92,13 @@ export default function SearchAddUpdateSelectCustomer() {
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="destructive">Add Customer Details</Button>
+                    {/* <Button variant="destructive">Add Customer Details</Button> */}
+                    <button
+                    className="flex items-center gap-2 w-full px-4 py-2 border border-gray-300 rounded-t-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-200"
+                    >
+                    <UserPlus className="w-5 h-5 text-gray-500" />
+                    <span className="text-sm">Customer</span>
+                    </button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogTitle>Add Customer Details</DialogTitle>
@@ -129,7 +144,7 @@ export default function SearchAddUpdateSelectCustomer() {
 
                         {/* Email */}
                         <div>
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email">Email (optional)</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -142,7 +157,7 @@ export default function SearchAddUpdateSelectCustomer() {
 
                         {/* Address */}
                         <div>
-                            <Label htmlFor="address">Address</Label>
+                            <Label htmlFor="address">Address (optional)</Label>
                             <Textarea
                                 id="address"
                                 value={data.address}

@@ -47,7 +47,11 @@ export function TeamSwitcher() {
         data: { restaurant_id },
         preserveScroll: true,
         // only: ['auth'],
-        onStart: () => localStorage.removeItem('selectedItems'),
+        onStart: () => {
+          localStorage.removeItem('activeBillId');
+          localStorage.removeItem('billCounter');
+          localStorage.removeItem('bills');
+        },
         onSuccess: () => {
           resolve(`Switched to ${restaurant_name}!`);
           setTimeout(() => {

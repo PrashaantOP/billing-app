@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
 class CustomersController extends Controller
@@ -80,11 +81,8 @@ class CustomersController extends Controller
             $customer = Customer::create($validated);
         }
 
-        return response()->json([
-            'message' => 'Customer saved successfully.',
-            'customer_id' => $customer->id,
-            'customer' => $customer,
-        ]);
+        Session::put('lastCustomerId', $customer->id);
+        return redirect()->back()->with('success', 'Customer added.');
     }
 
     public function update(Request $request)

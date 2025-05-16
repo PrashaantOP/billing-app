@@ -6,7 +6,7 @@ import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
 // import SettingsLayout from '@/layouts/settings/layout';
 import NewBillLayout from '@/layouts/newBill/layout';
-import {  Check, HandCoins, Landmark, Minus, Plus, Printer,  ShoppingCart, Split, WalletCards, X } from 'lucide-react';
+import {  Check, CheckCircle, HandCoins, Landmark, Minus, Plus, Printer,  Save,  ShoppingCart, Split, WalletCards, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EditTaxes from '@/pages/settings/taxes/editTaxes';
 import AddNewTax from '@/pages/settings/taxes/addTaxes';
@@ -76,17 +76,20 @@ export default function CreateNewBill({ categories, menuitems, categoryname, tax
 
 
 // right side cart work starts here
+// right side cart work starts here
 
 const [cartOpen, setCartOpen] = useState(false);
 
 // Payment details (optional: can be per bill if needed)
-const [paymentStatus, setPaymentStatus] = useState('');
+const [isPaid, setIsPaid] = useState(false);
 const [paymentMethod, setPaymentMethod] = useState('');
 const [transactionId, setTransactionId] = useState('');
-const [partialAmount, setPartialAmount] = useState('');
-// const [customerName, setCustomerName] = useState('');
-// const [customerPhone, setCustomerPhone] = useState('');
-// const [customerAddress, setCustomerAddress] = useState('');
+
+
+//discount
+const [applyDiscount, setApplyDiscount] = useState(false);
+const [discountType, setDiscountType] = useState('percent'); // 'percent' or 'fixed'
+const [discountValue, setDiscountValue] = useState('');
 
 
 
@@ -147,9 +150,10 @@ const handleSelect = (item: MenuItemType) => {
 
       const exists = bill.items.find(i => i.id === item.id);
       const updatedItems = exists
-        ? bill.items.filter(i => i.id !== item.id)
+        ? bill.items.map(i =>
+            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          )
         : [...bill.items, { ...item, quantity: 1 }];
-
 
       return {
         ...bill,
@@ -158,6 +162,27 @@ const handleSelect = (item: MenuItemType) => {
     })
   );
 };
+
+
+const removeItem = (id: number) => {
+  setBills(prevBills =>
+    prevBills.map(bill => {
+      if (bill.id !== activeBillId) return bill;
+      return {
+        ...bill,
+        items: bill.items.filter(item => item.id !== id),
+      };
+    })
+  );
+};
+
+
+
+
+
+
+// console.log(bills.find(bill => bill.id === activeBillId)?.items);
+
 
 const increaseQty = (id: number) => {
   setBills(prevBills =>
@@ -277,15 +302,48 @@ useEffect(() => {
 
 const selectedItems = activeBill?.items || [];
 
-const total = selectedItems.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0);
-const totalItem = selectedItems.reduce((sum, i) => sum + (i.quantity || 1), 0);
+// 🧮 Subtotal & Total Items
+const subtotal = selectedItems.reduce(
+  (sum, item) => sum + item.price * (item.quantity || 1),
+  0
+);
 
+const totalItems = selectedItems.reduce(
+  (sum, item) => sum + (item.quantity || 1),
+  0
+);
+
+// 🔻 Discount Calculation
+let discountAmount = 0;
+const numericDiscount = parseFloat(discountValue || '0');
+
+if (applyDiscount && numericDiscount > 0) {
+  if (discountType === 'percent') {
+    discountAmount = (subtotal * numericDiscount) / 100;
+  } else if (discountType === 'fixed') {
+    discountAmount = Math.min(numericDiscount, subtotal);
+  }
+}
+
+// 💳 Discounted Total (can't go below 0)
+const discountedTotal = Math.max(subtotal - discountAmount, 0);
+
+// 🧾 Tax Calculation
 const totalTax = taxes.reduce((sum, tax) => {
   const rate = parseFloat(tax.rate);
-  return sum + (tax.rate_type === 'percent' ? (total * rate) / 100 : rate);
+  return sum + (tax.rate_type === 'percent'
+    ? (discountedTotal * rate) / 100
+    : rate);
 }, 0);
 
-const totalWithTax = total + totalTax;
+// 🎯 Final Total
+const totalWithTax = discountedTotal + totalTax;
+console.log(totalTax);
+
+// console.log(totalWithTax);
+
+
+
 
 // console.log(activeBill);
 
@@ -352,7 +410,7 @@ const totalWithTax = total + totalTax;
                             return (
                                 <div
                                     key={item.id}
-                                    onClick={() => item.is_available && handleSelect(item)}
+                                    
                                     className={`relative p-4 border rounded-md shadow-sm bg-white cursor-pointer hover:shadow-lg transition-shadow duration-200 ${
                                         isSelected ? 'ring-2 ring-green-500' : ''
                                     }`}
@@ -360,11 +418,28 @@ const totalWithTax = total + totalTax;
                                     <img
                                         src={`/assets/images/menuitems/${item.image ? item.image : 'food-default.png'}`}
                                         alt={item.name}
-                                        className="w-full h-32 object-cover mb-2 aspect-square rounded-md"
+                                        className="w-full h-32 object-cover mb-2 aspect-square rounded-md select-none"
+                                        onClick={() => item.is_available && handleSelect(item)}
                                     />
                                     {isSelected && item.is_available && (
-                                        <div className="absolute top-0 left-0 w-full h-full bg-green-600/30 bg-opacity-50 flex items-center justify-center text-white text-sm font-medium rounded-md">
-                                            <Check className='w-10 h-10 text-green-600' />
+                                //     console.log(bills.find(bill => bill.id === activeBillId)?.items[0].id === item.id),
+                                        <div className="absolute top-0 left-0 w-full h-full bg-green-600/30 bg-opacity-50 flex flex-col items-start justify-start text-white text-sm font-medium rounded-md" >
+                                          <div className="flex flex-row items-center justify-between w-full mt-1 px-1">
+                                            <div className='w-5 h-5 flex flex-row align-center justify-center text-sm font-semibold text-white bg-green-600 rounded-full select-none'>{
+        bills.find(bill => bill.id === activeBillId)?.items.find(i => i.id === item.id)?.quantity ?? 1
+      }</div>
+                                            {/* <div className='w-6 h-6 flex flex-row align-center justify-center text-sm font-semibold text-green-700 hover:text-red-400 rounded-full'><X className='w-4' strokeWidth='3' /></div> */}
+                                            <button onClick={() => removeItem(item.id)} className="text-red-500 hover:text-red-700">
+  <X className="w-4 h-4" />
+</button>
+                                          </div>
+                                          <div className="flex items-center justify-center h-full w-full" onClick={() => item.is_available && handleSelect(item)}>
+                                            {/* <Check className='w-10 h-10 text-green-600' /> */}
+                                            {/* {
+        bills.find(bill => bill.id === activeBillId)?.items.find(i => i.id === item.id)?.quantity ?? 1
+      } */}
+                                          </div>
+                                            
                                         </div>
                                     )}
                                     {/* <div className="absolute top-0 left-0 w-full h-full bg-black/60 bg-opacity-50 flex items-center justify-center text-white text-sm font-medium rounded-md">
@@ -376,9 +451,11 @@ const totalWithTax = total + totalTax;
                                             Not Available
                                         </div>
                                     )}
-
-                                    <h3 className="text-lg font-semibold">{item.name.length > 12 ? `${item.name.slice(0, 10)}..` : item.name}</h3>
-                                    <p className="text-gray-500">Price: ₹{item.price}</p>
+                                    <div onClick={() => item.is_available && handleSelect(item)} >
+                                      <h3 className="text-lg font-semibold">{item.name.length > 12 ? `${item.name.slice(0, 10)}..` : item.name}</h3>
+                                      <p className="text-gray-500">Price: ₹{item.price}</p>
+                                    </div>
+                                    
                                 </div>
                             );
                         })
@@ -426,7 +503,7 @@ const totalWithTax = total + totalTax;
                             {taxes.length > 0 ? (
     taxes.map((item) => {
         const rate = parseFloat(item.rate);
-        const taxAmount = item.rate_type === 'percent' ? (total * rate) / 100 : rate;
+        const taxAmount = item.rate_type === 'percent' ? (subtotal * rate) / 100 : rate;
 
         return (
             <li key={item.id} className="flex justify-between gap-4 items-center">
@@ -445,88 +522,146 @@ const totalWithTax = total + totalTax;
 ) : (
     <div>No taxes available</div>
 )}
+
+<p>Subtotal: ₹{subtotal.toFixed(2)}</p>
+
+{applyDiscount && (
+  <p className="text-red-500">
+    Discount ({discountType === 'percent' ? `${discountValue}%` : `₹${discountValue}`}): -₹{discountAmount.toFixed(2)}
+  </p>
+)}
 <AddNewTax varient={'link'} size={'nopd'} />
+{/* <p>Subtotal: ₹{total.toFixed(2)}</p> */}
+{applyDiscount && (
+  <li className="flex justify-between gap-4 items-center">
+    <div className="flex">
+        <span className="text-xs">Discount</span><span className='text-xs flex flex-row items-center gap-2 ml-2'>
+        ({discountType === 'percent' ? `${discountValue}%` : `₹${discountValue}`})
+        </span>
+    </div>
+    <span className="text-xs font-semibold">
+        <span className="text-red-600">-</span> ₹{discountAmount.toFixed(2)}
+    </span>
+  </li>   
+)}
+
+{/* Discount Checkbox */}
+<li className="flex flex-wrap gap-2 pt-2 items-center justify-end">
+  <label className="flex items-center gap-2 cursor-pointer">
+    <input
+      type="checkbox"
+      checked={applyDiscount}
+      onChange={(e) => {
+        setApplyDiscount(e.target.checked);
+        if (!e.target.checked) {
+          setDiscountValue('');
+          setDiscountType('percent');
+        }
+      }}
+      className="w-5 h-5 text-green-600 accent-green-600"
+    />
+    <span className={`${applyDiscount ? 'text-green-600' : 'text-red-500'} font-medium`}>
+      Discount
+    </span>
+  </label>
+</li>
+
+{/* Discount Inputs: Only show if checkbox checked */}
+{applyDiscount && (
+  <li className="flex gap-2 items-center pt-2">
+    {/* Dropdown for Type */}
+    <select
+      value={discountType}
+      onChange={(e) => setDiscountType(e.target.value)}
+      className="px-2 py-2 border rounded-md"
+    >
+      <option value="percent">%</option>
+      <option value="fixed">₹</option>
+    </select>
+
+    {/* Input for Value */}
+    <input
+      type="number"
+      value={discountValue}
+      onChange={(e) => setDiscountValue(e.target.value)}
+      className="w-full px-3 py-2 border rounded-md"
+      placeholder={discountType === 'percent' ? 'Enter %' : 'Enter ₹ amount'}
+    />
+  </li>
+)}
 
 
-<li className="pt-4 border-t font-bold flex justify-between gap-4 mb-15">
+
+<li className="pt-4 border-t font-bold flex justify-between gap-4">
     <span>Total:</span>
     <span>₹{totalWithTax.toFixed(2)}</span>
 </li>
 
-                            {/* Payment Status Selection */}
-                            <li className='text-dark font-bold'>Payment Details</li>
+   <li className="flex flex-wrap gap-2 pt-2 items-center justify-end">
+  <label className="flex items-center gap-2 cursor-pointer">
+    <input
+      type="checkbox"
+      checked={isPaid}
+      onChange={(e) => {
+        setIsPaid(e.target.checked);
+        if (!e.target.checked) {
+          setPaymentMethod('');
+          setTransactionId('');
+        }
+      }}
+      className="w-5 h-5 text-green-600 accent-green-600"
+    />
+    <span className={`${isPaid ? 'text-green-600' : 'text-red-500'} font-medium`}>
+      Received
+    </span>
+  </label>
+</li>
+
+{isPaid && (
+  <>
     <li className="flex flex-wrap gap-2 pt-2">
       <button
-        onClick={() => { setPaymentStatus('paid'); setPaymentMethod(''); setTransactionId(''); }}
-        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'paid' ? 'bg-green-200 text-green-600' : 'bg-gray-200'}`}
+        onClick={() => setPaymentMethod('cash')}
+        className={`flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer ${
+          paymentMethod === 'cash' ? 'bg-green-200 text-green-600' : 'bg-gray-200'
+        }`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-banknote-arrow-up-icon lucide-banknote-arrow-up"><path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="M18 12h.01"/><path d="M19 22v-6"/><path d="m22 19-3-3-3 3"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>Paid
+        <HandCoins className="w-4 h-4" /> Cash
       </button>
       <button
-        onClick={() => { setPaymentStatus('pending'); setPaymentMethod(''); setTransactionId(''); }}
-        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'pending' ? 'bg-yellow-200 text-yellow-600' : 'bg-gray-200'}`}
-      ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-banknote-x-icon lucide-banknote-x"><path d="M13 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="m17 17 5 5"/><path d="M18 12h.01"/><path d="m22 17-5 5"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>
-        Pending
+        onClick={() => setPaymentMethod('bank')}
+        className={`flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer ${
+          paymentMethod === 'bank' ? 'bg-blue-200 text-blue-600' : 'bg-gray-200'
+        }`}
+      >
+        <Landmark className="w-4 h-4" /> Bank/UPI
       </button>
       <button
-        onClick={() => { setPaymentStatus('partial'); setPaymentMethod(''); setTransactionId(''); }}
-        className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentStatus === 'partial' ? 'bg-orange-200 text-orange-600' : 'bg-gray-200'}`}
-      ><Split className="w-4 h-4" />
-        Partial
+        onClick={() => setPaymentMethod('cheque')}
+        className={`flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer ${
+          paymentMethod === 'cheque' ? 'bg-purple-200 text-purple-600' : 'bg-gray-200'
+        }`}
+      >
+        <WalletCards className="w-4 h-4" /> Cheque
       </button>
     </li>
 
-    {/* Payment Method if Paid or Partial */}
-    {(paymentStatus === 'paid' || paymentStatus === 'partial') && (
-      <li className="flex flex-wrap gap-2 pt-2">
-        <button
-          onClick={() => setPaymentMethod('cash')}
-          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'cash' ? 'bg-green-200 text-green-600' : 'bg-gray-200'}`}
-        >
-          <HandCoins className='w-4 h-4'/> Cash
-        </button>
-        <button
-          onClick={() => setPaymentMethod('bank')}
-          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'bank' ? 'bg-blue-200 text-blue-600' : 'bg-gray-200'}`}
-        ><Landmark className='w-4 h-4'/>
-          Bank/UPI
-        </button>
-        <button
-          onClick={() => setPaymentMethod('cheque')}
-          className={`flex flex-row items-center justify-center gap-2 px-3 py-1 rounded-md cursor-pointer ${paymentMethod === 'cheque' ? 'bg-purple-200 text-purple-600' : 'bg-gray-200'}`}
-        ><WalletCards className='w-4 h-4'/>
-          Cheque
-        </button>
-      </li>
-    )}
-
-    {/* Transaction ID Input if Bank or Cheque Selected */}
     {(paymentMethod === 'bank' || paymentMethod === 'cheque') && (
-      <li className={`${paymentMethod !== 'bank' ? 'pb-2' : ''}`}>
-        <label className='text-xs'>{paymentMethod === 'bank' ? "Transaction ID" : "Cheque Number"}</label>
+      <li className="pt-2 w-full">
+        <label className="text-xs">
+          {paymentMethod === 'bank' ? 'Transaction ID' : 'Cheque Number'}
+        </label>
         <input
           type="text"
           value={transactionId}
           onChange={(e) => setTransactionId(e.target.value)}
           className="w-full px-3 py-2 border rounded-md"
-          placeholder={paymentMethod === 'bank' ? "Enter Transaction ID" : "Enter Cheque Number"}
+          placeholder={paymentMethod === 'bank' ? 'Enter Transaction ID' : 'Enter Cheque Number'}
         />
       </li>
     )}
-
-    {/* Partial Payment Input */}
-    {paymentStatus === 'partial' && (
-      <li className="pb-4">
-        <label htmlFor="partial_amount" className='text-xs'>Partial Amount</label>
-        <input
-          type="number"
-          value={partialAmount}
-          onChange={(e) => setPartialAmount(e.target.value)}
-          className="w-full px-3 py-2 border rounded-md"
-          placeholder="Enter Partial Amount"
-        />
-      </li>
-    )}
+  </>
+)}
     {/* <li className='text-black font-bold mb-5 mt-10'>Customer Details</li> */}
     <li className="pt-4 pb-1 border-t">
       <h6 className="text-dark font-bold my-3">Customer Details</h6>
@@ -589,7 +724,7 @@ const totalWithTax = total + totalTax;
                                     className="flex flex-col justify-center"
                                 >
                                     <span className="text-xs font-semibold">View cart</span>
-                                    <span className="text-xs">{totalItem} {totalItem > 1 ? " Items" : " Item"}</span>
+                                    <span className="text-xs">{totalItems} {totalItems > 1 ? " Items" : " Item"}</span>
                                 </motion.div>
                                     <motion.div
                                         initial={{ opacity: 0, rotate: -90 }}
@@ -635,7 +770,7 @@ const totalWithTax = total + totalTax;
                                     transition={{ delay: 0.3 }}
                                     className="flex flex-col justify-center"
                                 >
-                                    <span className="text-xs font-semibold">KOT + Bill</span>
+                                    <span className="text-xs font-semibold">Save</span>
                                     {/* <span className="text-xs">{totalItem} {totalItem > 1 ? " ITEMS" : " ITEM"}</span> */}
                                 </motion.div>
 
@@ -646,7 +781,7 @@ const totalWithTax = total + totalTax;
                                     transition={{ delay: 0.4 }}
                                     className="bg-black/10 rounded-full p-2"
                                 >
-                                    <Printer className="w-5 h-5" />
+                                    <Save className="w-5 h-5" />
                                 </motion.div>
                                 </motion.div>
                             )}
@@ -684,7 +819,7 @@ const totalWithTax = total + totalTax;
                                     transition={{ delay: 0.3 }}
                                     className="flex flex-col justify-center"
                                 >
-                                    <span className="text-xs font-semibold">Bill</span>
+                                    <span className="text-xs font-semibold">Save & Print</span>
                                     {/* <span className="text-xs">{totalItem} {totalItem > 1 ? " ITEMS" : " ITEM"}</span> */}
                                 </motion.div>
 

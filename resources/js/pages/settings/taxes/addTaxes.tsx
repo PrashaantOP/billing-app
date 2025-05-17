@@ -75,6 +75,7 @@ export default function AddNewTax({varient, size}: addbtnprop) {
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 required
+                                placeholder='Like GST, VAT, etc.'
                             />
                             <InputError className="mt-2" message={errors.name} />
                         </div>

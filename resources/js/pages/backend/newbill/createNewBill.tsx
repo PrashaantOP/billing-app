@@ -69,6 +69,16 @@ type Bill = {
       name: string;
       phone: string;
     };
+    discount?: {
+      apply: boolean;
+      type: 'percent' | 'fixed';
+      value: string;
+    };
+    payment?: {
+      isPaid: boolean;
+      method: string;
+      transactionId: string;
+    };
 };
 
 
@@ -84,6 +94,8 @@ const [cartOpen, setCartOpen] = useState(false);
 const [isPaid, setIsPaid] = useState(false);
 const [paymentMethod, setPaymentMethod] = useState('');
 const [transactionId, setTransactionId] = useState('');
+const [isReceived, setIsReceived] = useState(false);
+
 
 
 //discount
@@ -135,6 +147,24 @@ const removeBill = (id: number) => {
         return updated;
     });
 };
+
+const handleDiscountChange = (apply: boolean, type: 'percent' | 'fixed', value: string) => {
+  setBills(prevBills =>
+    prevBills.map(bill => {
+      if (bill.id !== activeBillId) return bill;
+
+      return {
+        ...bill,
+        discount: {
+          apply,
+          type,
+          value,
+        },
+      };
+    })
+  );
+};
+
 // console.log(bills);
 
 const activeBill = bills.find(bill => bill.id === activeBillId);
@@ -226,6 +256,63 @@ const decreaseQty = (id: number) => {
   );
 };
 
+const handleIsPaidChange = (paid: boolean) => {
+  setIsPaid(paid);
+  if (!paid) {
+    setPaymentMethod('');
+    setTransactionId('');
+  }
+
+  setBills(prevBills =>
+    prevBills.map(bill =>
+      bill.id === activeBillId
+        ? {
+            ...bill,
+            payment: {
+              isPaid: paid,
+              method: '',
+              transactionId: '',
+            },
+          }
+        : bill
+    )
+  );
+};
+
+const handlePaymentMethodChange = (method: string) => {
+  setPaymentMethod(method);
+  setBills(prevBills =>
+    prevBills.map(bill =>
+      bill.id === activeBillId && bill.payment?.isPaid
+        ? {
+            ...bill,
+            payment: {
+              ...bill.payment,
+              method,
+            },
+          }
+        : bill
+    )
+  );
+};
+
+const handleTransactionIdChange = (id: string) => {
+  setTransactionId(id);
+  setBills(prevBills =>
+    prevBills.map(bill =>
+      bill.id === activeBillId && bill.payment?.isPaid
+        ? {
+            ...bill,
+            payment: {
+              ...bill.payment,
+              transactionId: id,
+            },
+          }
+        : bill
+    )
+  );
+};
+
 // ==========================
 // useEffect: Load bills from localStorage (optional)
 // ==========================
@@ -296,6 +383,51 @@ useEffect(() => {
 useEffect(() => {
   localStorage.setItem('billCounter', billCounter.toString());
 }, [billCounter]);
+
+useEffect(() => {
+  const bill = bills.find(b => b.id === activeBillId);
+
+  if (bill?.discount) {
+    setApplyDiscount(bill.discount.apply);
+    setDiscountType(bill.discount.type);
+    setDiscountValue(bill.discount.value);
+  } else {
+    setApplyDiscount(false);
+    setDiscountType('percent');
+    setDiscountValue('');
+  }
+}, [activeBillId, bills]);
+
+useEffect(() => {
+  const bill = bills.find(b => b.id === activeBillId);
+
+  // Sync Discount UI
+  if (bill?.discount) {
+    setApplyDiscount(bill.discount.apply);
+    setDiscountType(bill.discount.type);
+    setDiscountValue(bill.discount.value);
+  } else {
+    setApplyDiscount(false);
+    setDiscountType('percent');
+    setDiscountValue('');
+  }
+
+  // 🔄 Sync Payment UI
+  if (bill?.payment) {
+    setIsPaid(bill.payment.isPaid);
+    setPaymentMethod(bill.payment.method);
+    setTransactionId(bill.payment.transactionId);
+  } else {
+    setIsPaid(false);
+    setPaymentMethod('');
+    setTransactionId('');
+  }
+
+  // 🔄 Sync Received checkbox (if used)
+  setIsReceived(!!bill?.received);
+
+}, [activeBillId, bills]);
+
 // ==========================
 // Calculations for Active Bill
 // ==========================
@@ -313,7 +445,7 @@ const totalItems = selectedItems.reduce(
   0
 );
 
-// 🔻 Discount Calculation
+//  Discount Calculation
 let discountAmount = 0;
 const numericDiscount = parseFloat(discountValue || '0');
 
@@ -328,7 +460,7 @@ if (applyDiscount && numericDiscount > 0) {
 // 💳 Discounted Total (can't go below 0)
 const discountedTotal = Math.max(subtotal - discountAmount, 0);
 
-// 🧾 Tax Calculation
+//  Tax Calculation
 const totalTax = taxes.reduce((sum, tax) => {
   const rate = parseFloat(tax.rate);
   return sum + (tax.rate_type === 'percent'
@@ -336,16 +468,11 @@ const totalTax = taxes.reduce((sum, tax) => {
     : rate);
 }, 0);
 
-// 🎯 Final Total
+//  Final Total
 const totalWithTax = discountedTotal + totalTax;
-console.log(totalTax);
 
-// console.log(totalWithTax);
+console.log('Total with tax:', totalTax.toFixed(2));
 
-
-
-
-// console.log(activeBill);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -500,39 +627,7 @@ console.log(totalTax);
                                 </div>
                                 </li>
                             ))}
-                            {taxes.length > 0 ? (
-    taxes.map((item) => {
-        const rate = parseFloat(item.rate);
-        const taxAmount = item.rate_type === 'percent' ? (subtotal * rate) / 100 : rate;
-
-        return (
-            <li key={item.id} className="flex justify-between gap-4 items-center">
-                <div className="flex">
-                    <span className="text-xs">{item.name}</span>
-                    <span className="text-xs flex flex-row items-center gap-2 ml-2">
-                        ({item.rate_type === 'percent' ? `${rate}%` : `₹${rate}`})<EditTaxes taxes={item} />
-                    </span>
-                </div>
-                <span className="text-xs font-semibold">
-                    <span className="text-green-600">+</span> ₹{taxAmount.toFixed(2)}
-                </span>
-            </li>
-        );
-    })
-) : (
-    <div>No taxes available</div>
-)}
-
-<p>Subtotal: ₹{subtotal.toFixed(2)}</p>
-
-{applyDiscount && (
-  <p className="text-red-500">
-    Discount ({discountType === 'percent' ? `${discountValue}%` : `₹${discountValue}`}): -₹{discountAmount.toFixed(2)}
-  </p>
-)}
-<AddNewTax varient={'link'} size={'nopd'} />
-{/* <p>Subtotal: ₹{total.toFixed(2)}</p> */}
-{applyDiscount && (
+                            {applyDiscount && (
   <li className="flex justify-between gap-4 items-center">
     <div className="flex">
         <span className="text-xs">Discount</span><span className='text-xs flex flex-row items-center gap-2 ml-2'>
@@ -544,6 +639,35 @@ console.log(totalTax);
     </span>
   </li>   
 )}
+                            {taxes.length > 0 ? (
+  taxes.map((item) => {
+    const rate = parseFloat(item.rate);
+    const taxAmount =
+      item.rate_type === 'percent' ? (discountedTotal * rate) / 100 : rate;
+
+    return (
+      <li key={item.id} className="flex justify-between gap-4 items-center">
+        <div className="flex">
+          <span className="text-xs">{item.name}</span>
+          <span className="text-xs flex flex-row items-center gap-2 ml-2">
+            ({item.rate_type === 'percent' ? `${rate}%` : `₹${rate}`})<EditTaxes taxes={item} />
+          </span>
+        </div>
+        <span className="text-xs font-semibold">
+          <span className="text-green-600">+</span> ₹{taxAmount.toFixed(2)}
+        </span>
+      </li>
+    );
+  })
+) : (
+  <div></div>
+)}
+
+
+
+<AddNewTax varient={'link'} size={'nopd'} />
+{/* <p>Subtotal: ₹{total.toFixed(2)}</p> */}
+
 
 {/* Discount Checkbox */}
 <li className="flex flex-wrap gap-2 pt-2 items-center justify-end">
@@ -551,13 +675,17 @@ console.log(totalTax);
     <input
       type="checkbox"
       checked={applyDiscount}
-      onChange={(e) => {
-        setApplyDiscount(e.target.checked);
-        if (!e.target.checked) {
-          setDiscountValue('');
-          setDiscountType('percent');
-        }
-      }}
+  onChange={(e) => {
+    const isChecked = e.target.checked;
+    setApplyDiscount(isChecked);
+
+    if (!isChecked) {
+      setDiscountValue('');
+      setDiscountType('percent');
+    }
+
+    handleDiscountChange(isChecked, 'percent', ''); // reset or initialize
+  }}
       className="w-5 h-5 text-green-600 accent-green-600"
     />
     <span className={`${applyDiscount ? 'text-green-600' : 'text-red-500'} font-medium`}>
@@ -572,7 +700,11 @@ console.log(totalTax);
     {/* Dropdown for Type */}
     <select
       value={discountType}
-      onChange={(e) => setDiscountType(e.target.value)}
+      onChange={(e) => {
+    const newType = e.target.value as 'percent' | 'fixed';
+    setDiscountType(newType);
+    handleDiscountChange(applyDiscount, newType, discountValue);
+  }}
       className="px-2 py-2 border rounded-md"
     >
       <option value="percent">%</option>
@@ -583,7 +715,11 @@ console.log(totalTax);
     <input
       type="number"
       value={discountValue}
-      onChange={(e) => setDiscountValue(e.target.value)}
+      onChange={(e) => {
+    const val = e.target.value;
+    setDiscountValue(val);
+    handleDiscountChange(applyDiscount, discountType, val);
+  }}
       className="w-full px-3 py-2 border rounded-md"
       placeholder={discountType === 'percent' ? 'Enter %' : 'Enter ₹ amount'}
     />
@@ -602,13 +738,7 @@ console.log(totalTax);
     <input
       type="checkbox"
       checked={isPaid}
-      onChange={(e) => {
-        setIsPaid(e.target.checked);
-        if (!e.target.checked) {
-          setPaymentMethod('');
-          setTransactionId('');
-        }
-      }}
+  onChange={(e) => handleIsPaidChange(e.target.checked)}
       className="w-5 h-5 text-green-600 accent-green-600"
     />
     <span className={`${isPaid ? 'text-green-600' : 'text-red-500'} font-medium`}>
@@ -621,7 +751,7 @@ console.log(totalTax);
   <>
     <li className="flex flex-wrap gap-2 pt-2">
       <button
-        onClick={() => setPaymentMethod('cash')}
+        onClick={() => handlePaymentMethodChange('cash')}
         className={`flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer ${
           paymentMethod === 'cash' ? 'bg-green-200 text-green-600' : 'bg-gray-200'
         }`}
@@ -629,7 +759,7 @@ console.log(totalTax);
         <HandCoins className="w-4 h-4" /> Cash
       </button>
       <button
-        onClick={() => setPaymentMethod('bank')}
+        onClick={() => handlePaymentMethodChange('bank')}
         className={`flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer ${
           paymentMethod === 'bank' ? 'bg-blue-200 text-blue-600' : 'bg-gray-200'
         }`}
@@ -637,7 +767,7 @@ console.log(totalTax);
         <Landmark className="w-4 h-4" /> Bank/UPI
       </button>
       <button
-        onClick={() => setPaymentMethod('cheque')}
+        onClick={() => handlePaymentMethodChange('cheque')}
         className={`flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer ${
           paymentMethod === 'cheque' ? 'bg-purple-200 text-purple-600' : 'bg-gray-200'
         }`}
@@ -654,7 +784,7 @@ console.log(totalTax);
         <input
           type="text"
           value={transactionId}
-          onChange={(e) => setTransactionId(e.target.value)}
+          onChange={(e) => handleTransactionIdChange(e.target.value)}
           className="w-full px-3 py-2 border rounded-md"
           placeholder={paymentMethod === 'bank' ? 'Enter Transaction ID' : 'Enter Cheque Number'}
         />

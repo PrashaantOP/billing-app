@@ -6,7 +6,7 @@ import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
 // import SettingsLayout from '@/layouts/settings/layout';
 import NewBillLayout from '@/layouts/newBill/layout';
-import {  Check, CheckCircle, HandCoins, Landmark, Minus, Plus, Printer,  Save,  ShoppingCart, Split, WalletCards, X } from 'lucide-react';
+import {  Check, CheckCircle, HandCoins, Info, Landmark, Minus, Plus, Printer,  Save,  ShoppingCart, Split, WalletCards, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EditTaxes from '@/pages/settings/taxes/editTaxes';
 import AddNewTax from '@/pages/settings/taxes/addTaxes';
@@ -545,9 +545,18 @@ console.log('Total with tax:', totalTax.toFixed(2));
                                     <img
                                         src={`/assets/images/menuitems/${item.image ? item.image : 'food-default.png'}`}
                                         alt={item.name}
-                                        className="w-full h-32 object-cover mb-2 aspect-square rounded-md select-none"
+                                        className="w-full h-fit sm:h-32 object-cover mb-2 aspect-square rounded-md select-none"
                                         onClick={() => item.is_available && handleSelect(item)}
                                     />
+
+
+                                    {/* varient start */}
+
+                                    {/* <div className="absolute top-0 left-0 w-full h-fit py-2 px-2 bg-transparant bg-opacity-50 flex items-center justify-end text-white text-sm font-medium rounded-md">
+                                    <Info className="w-5 h-5 text-green-600" />
+                                    </div> */}
+
+                                    {/* varient end */}
                                     {isSelected && item.is_available && (
                                 //     console.log(bills.find(bill => bill.id === activeBillId)?.items[0].id === item.id),
                                         <div className="absolute top-0 left-0 w-full h-full bg-green-600/30 bg-opacity-50 flex flex-col items-start justify-start text-white text-sm font-medium rounded-md" >
@@ -726,14 +735,14 @@ console.log('Total with tax:', totalTax.toFixed(2));
   </li>
 )}
 
+<div className='bg-red-100/50 p-2 rounded-md mt-4'>
 
-
-<li className="pt-4 border-t font-bold flex justify-between gap-4">
+<li className="font-bold flex justify-between gap-4 ">
     <span>Total:</span>
     <span>₹{totalWithTax.toFixed(2)}</span>
 </li>
 
-   <li className="flex flex-wrap gap-2 pt-2 items-center justify-end">
+   <li className="flex flex-wrap gap-2 pt-2 items-center justify-end ">
   <label className="flex items-center gap-2 cursor-pointer">
     <input
       type="checkbox"
@@ -792,6 +801,7 @@ console.log('Total with tax:', totalTax.toFixed(2));
     )}
   </>
 )}
+</div>
     {/* <li className='text-black font-bold mb-5 mt-10'>Customer Details</li> */}
     <li className="pt-4 pb-1 border-t">
       <h6 className="text-dark font-bold my-3">Customer Details</h6>

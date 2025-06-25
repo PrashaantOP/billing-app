@@ -17,7 +17,7 @@ export default function TaxSection({ taxes, discountedTotal }) {
               <span className="text-xs">{item.name}</span>
               <span className="text-xs ml-2 flex flex-row items-center justify-center gap-2">
                 ({item.rate_type === 'percent' ? `${rate}%` : `₹${rate}`})
-                <EditTaxes taxes={item} />
+                {/* <EditTaxes taxes={item} /> */}
               </span>
             </div>
             <span className="text-xs font-semibold text-green-600">

@@ -42,7 +42,7 @@ export default function MenuItemGrid({
                 {isSelected && item.is_available && (
                   <div className="absolute top-0 left-0 w-full h-full bg-green-600/30 flex flex-col items-start justify-start text-white text-sm font-medium rounded-md">
                     <div className="flex justify-between w-full mt-1 px-1">
-                      <div className="w-5 h-5 flex justify-center items-center text-sm font-semibold bg-green-600 rounded-full">
+                      <div className="w-5 h-5 flex justify-center items-center text-sm font-semibold bg-green-600 rounded-full select-none">
                         {quantity}
                       </div>
                       <button
@@ -65,10 +65,10 @@ export default function MenuItemGrid({
                 )}
 
                 <div className="mt-2">
-                  <h3 className="text-lg font-semibold">
+                  <h3 className="text-lg font-semibold select-none">
                     {item.name.length > 12 ? `${item.name.slice(0, 10)}..` : item.name}
                   </h3>
-                  <p className="text-gray-500">Price: ₹{item.price}</p>
+                  <p className="text-gray-500 select-none">Price: ₹{item.price}</p>
                 </div>
               </div>
             );

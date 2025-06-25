@@ -7,6 +7,7 @@ import TaxSection from './TaxSection'
 import PaymentPanel from './PaymentPanel'
 import CustomerInfo from './CustomerInfo'
 import AddNewTax from '@/pages/settings/taxes/addTaxes'
+import OrderTypeSwitcher from './OrderTypeSwitcher'
 // import AddNewTax from './AddNewTax'
 
 
@@ -103,6 +104,9 @@ type Tax = {
           <X className="w-5 h-5 cursor-pointer" />
         </button>
       </div>
+      <div className='p-4 overflow-y-auto'>
+        <OrderTypeSwitcher />
+      </div>
 
       <div className="p-4 overflow-y-auto h-[calc(100%-100px)]">
         {selectedItems.length > 0 ? (
@@ -127,7 +131,7 @@ type Tax = {
 
             <TaxSection taxes={taxes} discountedTotal={discountedTotal} />
 
-            <AddNewTax varient="link" size="nopd" />
+            {/* <AddNewTax varient="link" size="nopd" /> */}
 
             <li className="pt-4 border-t font-bold flex justify-between gap-4">
               <span>Total:</span>

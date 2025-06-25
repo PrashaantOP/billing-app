@@ -6,6 +6,7 @@ use App\Http\Controllers\Administator\PlansController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\DiningTableController;
+use App\Http\Controllers\Api\ApiDiningTableController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\Settings\RestaurantSwitchController;
@@ -55,6 +56,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // routes/web.php
     Route::get('/restaurants/view', [RestaurantController::class, 'index'])->name('restaurants.index');
+
+    // here is api call
+    // Route::middleware('api')->group(function () {
+        Route::get('/api/dining-tables', [ApiDiningTableController::class, 'index']);
+    // });
 });
 
 require __DIR__ . '/settings.php';

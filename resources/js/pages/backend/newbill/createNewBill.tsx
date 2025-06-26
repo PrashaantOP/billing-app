@@ -11,6 +11,7 @@ import FloatingCartToggle from './components/FloatingCartToggle';
 import BillTabs from './components/BillTabs';
 import MenuItemGrid from './components/MenuItemGrid';
 import CartSidebar from './components/CartSidebar';
+import toast from 'react-hot-toast';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -465,7 +466,7 @@ const totalTax = taxes.reduce((sum, tax) => {
 //  Final Total
 const totalWithTax = discountedTotal + totalTax;
 // console.log('Total with tax:', totalTax.toFixed(2));
-// console.log(bills);
+console.log(bills);
 const handleSaveOrder = () => {
   const bill = bills.find(b => b.id === activeBillId);
   if (!bill || bill.items.length === 0) {
@@ -512,7 +513,32 @@ const handleSaveOrder = () => {
     },
     onSuccess: () => {
       // ✅ Optional: clear cart, show toast, etc.
-      alert('Order saved successfully.')
+      toast.success('Order successfully created!')
+      // ✅ Reset bills state
+    const defaultBill = {
+        id: Date.now(),
+        name: 'Bill 1',
+        items: [],
+      }
+
+      setBills([defaultBill])
+      setActiveBillId(defaultBill.id)
+      setBillCounter(2)
+
+      // ✅ Also reset payment & discount UI if needed
+      setIsPaid(false)
+      setPaymentMethod('')
+      setTransactionId('')
+      setApplyDiscount(false)
+      setDiscountType('percent')
+      setDiscountValue('')
+      setCartOpen(false)
+
+      // ✅ Remove any localStorage data
+      localStorage.removeItem('bills')
+      localStorage.removeItem('activeBillId')
+      localStorage.setItem('billCounter', '2')
+    //   alert('Order saved successfully.')
     },
   })
 };

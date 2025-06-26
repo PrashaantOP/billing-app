@@ -21,7 +21,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Orders',
-        href: '/orders',
+        href: '/orders/view',
         icon: PackageCheck,
     },
     {

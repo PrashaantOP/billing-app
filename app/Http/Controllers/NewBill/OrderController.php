@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class OrderController extends Controller
 {
@@ -109,6 +110,7 @@ class OrderController extends Controller
                 $order->payments()->create([
                     'restaurant_id' => $restaurantId,
                     'payment_method' => $data['payment']['method'],
+                    'transaction_reference' => $data['payment']['transactionId'],
                     'transaction_id' => $data['payment']['transactionId'] ?? null,
                     'amount_paid' => $data['total'],
                     'payment_date' => Carbon::now(),
@@ -118,10 +120,15 @@ class OrderController extends Controller
 
             DB::commit();
 
-            return redirect()->route('orders.store')->with('success', 'Order created successfully!');
+            return back()->with('success', 'Order created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Failed to save order: ' . $e->getMessage()]);
         }
+    }
+
+    public function viewOderPage()
+    {
+        return Inertia::render('backend/orders/OrderMain');
     }
 }

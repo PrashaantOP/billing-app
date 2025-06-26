@@ -18,6 +18,7 @@ const OrderTypeSwitcher = ({
 
   useEffect(() => {
     if (orderType === 'dinein') {
+        setOrderType('dinein');
       fetchDiningTables();
     } else {
       // reset selectedTable when not dinein

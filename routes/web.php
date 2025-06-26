@@ -65,6 +65,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //new order
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+    //view order
+    Route::get('/orders/view', [OrderController::class, 'viewOderPage'])->name('orders.view');
 });
 
 require __DIR__ . '/settings.php';

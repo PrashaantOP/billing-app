@@ -1,6 +1,15 @@
 import React from 'react'
 import { HandCoins, Landmark, WalletCards } from 'lucide-react'
 
+interface PaymentPanelProps {
+  isPaid: boolean;
+  paymentMethod: string;
+  transactionId: string;
+  handleIsPaidChange: (isPaid: boolean) => void;
+  handlePaymentMethodChange: (method: string) => void;
+  handleTransactionIdChange: (id: string) => void;
+}
+
 export default function PaymentPanel({
   isPaid,
   paymentMethod,
@@ -8,7 +17,7 @@ export default function PaymentPanel({
   handleIsPaidChange,
   handlePaymentMethodChange,
   handleTransactionIdChange,
-}) {
+}: PaymentPanelProps) {
   return (
     <>
       <li className="flex flex-wrap gap-2 pt-2 items-center justify-end">

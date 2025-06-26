@@ -55,4 +55,9 @@ class Restaurant extends Model
     {
         return $this->hasMany(Log::class);
     }
+
+    public function orderTaxes()
+    {
+        return $this->hasMany(OrderTax::class);
+    }
 }

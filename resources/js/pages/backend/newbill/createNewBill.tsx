@@ -1,17 +1,12 @@
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import {  useEffect, useState } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
 // import SettingsLayout from '@/layouts/settings/layout';
 import NewBillLayout from '@/layouts/newBill/layout';
-import {  Check, CheckCircle, HandCoins, Landmark, Minus, Plus, Printer,  Save,  ShoppingCart, Split, WalletCards, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import EditTaxes from '@/pages/settings/taxes/editTaxes';
-import AddNewTax from '@/pages/settings/taxes/addTaxes';
 import NewMenuItem from '../menuItems/addMenuItems';
-import SearchAddUpdateSelectCustomer from '../customers/searchAddUpdateCustomer';
 import FloatingCartToggle from './components/FloatingCartToggle';
 import BillTabs from './components/BillTabs';
 import MenuItemGrid from './components/MenuItemGrid';
@@ -69,6 +64,8 @@ type Bill = {
     id: number;
     name: string;
     items: MenuItemType[];
+    orderType?: string;
+    diningTableId?: string;
     customer?: {
       name: string;
       phone: string;
@@ -104,10 +101,8 @@ const [isReceived, setIsReceived] = useState(false);
 
 //discount
 const [applyDiscount, setApplyDiscount] = useState(false);
-const [discountType, setDiscountType] = useState('percent'); // 'percent' or 'fixed'
+const [discountType, setDiscountType] = useState('percent');
 const [discountValue, setDiscountValue] = useState('');
-
-
 
 // Tabs / Bills
 const [bills, setBills] = useState<Bill[]>([]);
@@ -119,7 +114,7 @@ const [billCounter, setBillCounter] = useState(() => {
 // console.log(activeBillId);
 useEffect(() => {
     if (bills.length === 0) {
-        const defaultBill = { id: Date.now(), name: 'Bill 1', items: [] };
+        const defaultBill = { id: Date.now(), name: 'Bill 1', items: [], orderType: 'dinein', diningTableId: '', };
         setBills([defaultBill]);
         setActiveBillId(defaultBill.id);
         setBillCounter(2);
@@ -131,7 +126,7 @@ useEffect(() => {
 
 const addNewBill = () => {
     const newId = Date.now();
-    const newBill = { id: newId, name: `Bill ${billCounter}`, items: [] };
+    const newBill = { id: newId, name: `Bill ${billCounter}`, items: [], orderType: 'dinein', diningTableId: '' };
     setBills(prev => [...prev, newBill]);
     setActiveBillId(newId);
     setBillCounter(prev => prev + 1);
@@ -209,11 +204,6 @@ const removeItem = (id: number) => {
     })
   );
 };
-
-
-
-
-
 
 // console.log(bills.find(bill => bill.id === activeBillId)?.items);
 
@@ -474,7 +464,59 @@ const totalTax = taxes.reduce((sum, tax) => {
 
 //  Final Total
 const totalWithTax = discountedTotal + totalTax;
-console.log('Total with tax:', totalTax.toFixed(2));
+// console.log('Total with tax:', totalTax.toFixed(2));
+// console.log(bills);
+const handleSaveOrder = () => {
+  const bill = bills.find(b => b.id === activeBillId);
+  if (!bill || bill.items.length === 0) {
+    alert('No items to save.');
+    return;
+  }
+
+  const discountType = bill.discount?.type || null;
+  const discountValue = bill.discount?.value || null;
+  const discountAmount = applyDiscount && discountValue
+    ? discountType === 'percent'
+      ? (subtotal * parseFloat(discountValue)) / 100
+      : parseFloat(discountValue)
+    : 0;
+
+  const payload = {
+    // restaurant_id: null,
+    order_type: bill.orderType || 'dinein',
+    dining_table_id: bill.orderType === 'dinein' ? bill.diningTableId || null : null,
+    customer: bill.customer || null,
+
+    items: bill.items.map(i => ({
+      menu_item_id: i.id,
+      quantity: i.quantity || 1,
+      price: i.price,
+      total_price: i.price * (i.quantity || 1),
+    })),
+
+    discount_type: discountType,
+    discount_value: discountValue,
+    discount: discountAmount,
+    subtotal,
+    tax: totalTax,
+    total: totalWithTax,
+    payment_status: bill.payment?.isPaid ? 'paid' : 'pending',
+    payment: bill.payment || null,
+  };
+
+  router.post('/orders', payload, {
+    onError: (errors) => {
+      // ✅ Show specific error
+      console.error('Validation errors:', errors)
+      alert(errors.error || 'Failed to save order.')
+    },
+    onSuccess: () => {
+      // ✅ Optional: clear cart, show toast, etc.
+      alert('Order saved successfully.')
+    },
+  })
+};
+
 
 
     return (
@@ -534,6 +576,22 @@ console.log('Total with tax:', totalTax.toFixed(2));
                     handlePaymentMethodChange={handlePaymentMethodChange}
                     handleTransactionIdChange={handleTransactionIdChange}
                     activeBill={activeBill}
+                    orderType={activeBill?.orderType || 'dinein'}
+                    setOrderType={(type) =>
+                      setBills(prev =>
+                        prev.map(bill =>
+                          bill.id === activeBillId ? { ...bill, orderType: type } : bill
+                        )
+                      )
+                    }
+                    selectedTable={activeBill?.diningTableId || ''}
+                    setSelectedTable={(id) =>
+                      setBills(prev =>
+                        prev.map(bill =>
+                          bill.id === activeBillId ? { ...bill, diningTableId: id } : bill
+                        )
+                      )
+                    }
                 />
 
 
@@ -543,6 +601,7 @@ console.log('Total with tax:', totalTax.toFixed(2));
   cartOpen={cartOpen}
   setCartOpen={setCartOpen}
   totalItems={totalItems}
+  handleSaveOrder={handleSaveOrder}
 />
 
                 </div>

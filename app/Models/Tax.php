@@ -14,4 +14,9 @@ class Tax extends Model
     {
         return $this->belongsTo(Restaurant::class);
     }
+
+    public function orderTaxes()
+    {
+        return $this->hasMany(OrderTax::class);
+    }
 }

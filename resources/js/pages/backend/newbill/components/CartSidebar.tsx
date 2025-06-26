@@ -64,6 +64,10 @@ type Tax = {
     handlePaymentMethodChange: (method: string) => void
     handleTransactionIdChange: (id: string) => void
     activeBill: Bill | undefined
+    orderType: 'dinein' | 'takeaway' | 'delivery';
+    setOrderType: (type: 'dinein' | 'takeaway' | 'delivery') => void;
+    selectedTable: string;
+    setSelectedTable: (id: string) => void;
   }
 
   export default function CartSidebar({
@@ -91,6 +95,10 @@ type Tax = {
     handlePaymentMethodChange,
     handleTransactionIdChange,
     activeBill,
+    orderType,
+    setOrderType,
+    selectedTable,
+    setSelectedTable
   }: CartSidebarProps) {
     return (
     <div
@@ -105,7 +113,12 @@ type Tax = {
         </button>
       </div>
       <div className='p-4 overflow-y-auto'>
-        <OrderTypeSwitcher />
+        <OrderTypeSwitcher
+          orderType={orderType}
+          setOrderType={setOrderType}
+          selectedTable={selectedTable}
+          setSelectedTable={setSelectedTable}
+        />
       </div>
 
       <div className="p-4 overflow-y-auto h-[calc(100%-100px)]">

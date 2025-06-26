@@ -8,9 +8,10 @@ type Props = {
   cartOpen: boolean
   setCartOpen: (open: boolean) => void
   totalItems: number
+  handleSaveOrder: () => void;
 }
 
-const FloatingCartToggle: React.FC<Props> = ({ selectedItems, cartOpen, setCartOpen, totalItems }) => {
+const FloatingCartToggle: React.FC<Props> = ({ selectedItems, cartOpen, setCartOpen, totalItems, handleSaveOrder }) => {
   return (
     <div className="fixed bottom-4 right-0 z-5 flex items-center justify-center lg:justify-end px-0 lg:px-10 gap-3 w-full">
       <AnimatePresence>
@@ -89,6 +90,7 @@ const FloatingCartToggle: React.FC<Props> = ({ selectedItems, cartOpen, setCartO
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
                 className="flex flex-col justify-center"
+                onClick={handleSaveOrder}
               >
                 <span className="text-xs font-semibold">Save</span>
               </motion.div>

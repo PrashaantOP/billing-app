@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\DiningTableController;
 use App\Http\Controllers\Api\ApiDiningTableController;
+use App\Http\Controllers\NewBill\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\Settings\RestaurantSwitchController;
@@ -59,8 +60,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // here is api call
     // Route::middleware('api')->group(function () {
-        Route::get('/api/dining-tables', [ApiDiningTableController::class, 'index']);
+    Route::get('/api/dining-tables', [ApiDiningTableController::class, 'index']);
     // });
+
+    //new order
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 });
 
 require __DIR__ . '/settings.php';

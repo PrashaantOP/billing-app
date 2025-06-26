@@ -111,11 +111,13 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('dining_table_id')->nullable();
             $table->string('order_number')->unique();
-            $table->enum('order_type', ['dine-in', 'takeaway', 'delivery']);
+            $table->enum('order_type', ['dinein', 'takeaway', 'delivery']);
             $table->enum('status', ['pending', 'preparing', 'served', 'completed', 'cancelled'])->default('pending');
             $table->decimal('subtotal', 10, 2)->default(0);
             $table->decimal('tax', 10, 2)->default(0);
-            $table->decimal('discount', 10, 2)->default(0);
+            $table->enum('discount_type', ['percent', 'fixed'])->nullable();
+            $table->decimal('discount_value', 10, 2)->nullable();
+            $table->decimal('discount', 10, 2)->default(0); // final calculated discount
             $table->decimal('total', 10, 2)->default(0);
             $table->enum('payment_status', ['pending', 'paid', 'partial'])->default('pending');
             $table->timestamps();

@@ -50,4 +50,9 @@ class Order extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function taxes()
+    {
+        return $this->hasMany(OrderTax::class);
+    }
 }

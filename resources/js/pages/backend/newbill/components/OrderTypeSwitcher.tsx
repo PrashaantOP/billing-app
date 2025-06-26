@@ -1,29 +1,42 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 
-const OrderTypeSwitcher = () => {
-  const [orderType, setOrderType] = useState<'dinein' | 'takeaway' | 'delivery'>('dinein')
-  const [selectedTable, setSelectedTable] = useState('')
-  const [tables, setTables] = useState<{ id: number; name: string }[]>([])
-  const [loading, setLoading] = useState(false)
+type Props = {
+  orderType: 'dinein' | 'takeaway' | 'delivery';
+  setOrderType: (type: 'dinein' | 'takeaway' | 'delivery') => void;
+  selectedTable: string;
+  setSelectedTable: (id: string) => void;
+};
+
+const OrderTypeSwitcher = ({
+  orderType,
+  setOrderType,
+  selectedTable,
+  setSelectedTable,
+}: Props) => {
+  const [tables, setTables] = useState<{ id: number; name: string }[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (orderType === 'dinein') {
-      fetchDiningTables()
+      fetchDiningTables();
+    } else {
+      // reset selectedTable when not dinein
+      setSelectedTable('');
     }
-  }, [orderType])
+  }, [orderType]);
 
   const fetchDiningTables = async () => {
     try {
-      setLoading(true)
-      const response = await fetch('/api/dining-tables')
-      const data = await response.json()
-      setTables(data)
+      setLoading(true);
+      const response = await fetch('/api/dining-tables');
+      const data = await response.json();
+      setTables(data);
     } catch (error) {
-      console.error('Failed to fetch dining tables:', error)
+      console.error('Failed to fetch dining tables:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -58,7 +71,7 @@ const OrderTypeSwitcher = () => {
               <option disabled>Loading...</option>
             ) : (
               tables.map((table) => (
-                <option key={table.id} value={table.id}>
+                <option key={table.id} value={String(table.id)}>
                   {table.name}
                 </option>
               ))
@@ -67,7 +80,7 @@ const OrderTypeSwitcher = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default OrderTypeSwitcher
+export default OrderTypeSwitcher;

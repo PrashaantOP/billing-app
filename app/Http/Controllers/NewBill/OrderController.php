@@ -86,7 +86,7 @@ class OrderController extends Controller
             }
 
             // 💰 Handle Taxes
-            $activeTaxes = \App\Models\Tax::where('restaurant_id', $restaurantId)->get();
+            $activeTaxes = \App\Models\Tax::where('restaurant_id', $restaurantId)->where('is_inclusive', 1)->get();
 
             $discountedSubtotal = $data['subtotal'] - ($data['discount'] ?? 0);
             foreach ($activeTaxes as $tax) {
@@ -129,6 +129,10 @@ class OrderController extends Controller
 
     public function viewOderPage()
     {
-        return Inertia::render('backend/orders/OrderMain');
+        $restaurantId = session('current_restaurant_id');
+        $pagedata['orders'] = Order::where('restaurant_id', $restaurantId)->with('customer', 'diningTable')->get();
+        // if (!empty())
+        // dd($pagedata['orders']);
+        return Inertia::render('backend/orders/OrderMain', $pagedata);
     }
 }

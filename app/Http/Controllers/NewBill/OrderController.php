@@ -113,6 +113,7 @@ class OrderController extends Controller
                     'transaction_reference' => $data['payment']['transactionId'],
                     'transaction_id' => $data['payment']['transactionId'] ?? null,
                     'amount_paid' => $data['total'],
+                    'status' => $data['payment_status'],
                     'payment_date' => Carbon::now(),
                     'status' => 'paid',
                 ]);
@@ -127,12 +128,44 @@ class OrderController extends Controller
         }
     }
 
-    public function viewOderPage()
+    public function viewOderPage(Request $request)
     {
         $restaurantId = session('current_restaurant_id');
-        $pagedata['orders'] = Order::where('restaurant_id', $restaurantId)->with('customer', 'diningTable')->get();
-        // if (!empty())
-        // dd($pagedata['orders']);
-        return Inertia::render('backend/orders/OrderMain', $pagedata);
+
+        $search = $request->input('search');
+
+        $ordersQuery = Order::where('restaurant_id', $restaurantId)
+            ->with('customer', 'diningTable');
+
+        if ($search) {
+            $ordersQuery->whereHas('customer', function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%");
+            });
+        }
+
+        $orders = $ordersQuery->latest()->paginate(3)->withQueryString();
+
+        return Inertia::render('backend/orders/OrderMain', [
+            'orders' => $orders,
+            'filters' => [
+                'search' => $search,
+            ],
+        ]);
+    }
+
+    public function updateOrderType(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'order_type' => 'required|in:dinein,takeaway,delivery',
+            'status' => 'required|in:pending,preparing,served,completed,cancelled',
+        ]);
+
+        $order->update([
+            'order_type' => $validated['order_type'],
+            'status' => $validated['status'],
+        ]);
+
+        return back()->with('success', 'Order updated successfully.');
     }
 }

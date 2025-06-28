@@ -119,6 +119,8 @@ return new class extends Migration
             $table->decimal('discount_value', 10, 2)->nullable();
             $table->decimal('discount', 10, 2)->default(0); // final calculated discount
             $table->decimal('total', 10, 2)->default(0);
+            $table->decimal('amount_paid', 10, 2)->default(0);
+            $table->decimal('due_amount', 10, 2)->default(0);
             $table->enum('payment_status', ['pending', 'paid', 'partial'])->default('pending');
             $table->timestamps();
 
@@ -165,6 +167,7 @@ return new class extends Migration
             $table->decimal('amount_paid', 10, 2);
             $table->string('payment_method');
             $table->string('transaction_reference')->nullable();
+            $table->enum('status', ['paid', 'partial']);
             $table->text('notes')->nullable();
             $table->timestamps();
 

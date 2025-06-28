@@ -20,6 +20,8 @@ class Order extends Model
         'discount_value',
         'discount',
         'total',
+        'amount_paid',
+        'due_amount',
         'payment_status',
         'created_at',
         'updated_at',

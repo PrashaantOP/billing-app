@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { IconDotsVertical } from "@tabler/icons-react"
 import { ArrowUpFromDot, Delete, Dot, Download, EllipsisVertical, ExternalLink, FileDown, Pencil, Trash } from "lucide-react"
+import { OrderStatus } from "./OrderStatus"
 
 type OrderProps = {
     order: {
@@ -43,8 +44,18 @@ export function OrderActionDropdown({order} : OrderProps) {
             <DropdownMenuSubTrigger>Edit order</DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-                <DropdownMenuItem>Payment status</DropdownMenuItem>
-                <DropdownMenuItem>Order status</DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Payment status</DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem>Paid</DropdownMenuItem>
+                      <DropdownMenuItem>Not Paid</DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+                <DropdownMenuItem>
+                  Order status
+                </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

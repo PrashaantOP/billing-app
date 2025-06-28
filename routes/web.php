@@ -68,6 +68,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //view order
     Route::get('/orders/view', [OrderController::class, 'viewOderPage'])->name('orders.view');
+    Route::get('/orders-view', [OrderController::class, 'viewOderPage'])->name('orders.view.search');
+    Route::patch('/orders-type/{order}', [OrderController::class, 'updateOrderType'])->name('orders.type.update');
 });
 
 require __DIR__ . '/settings.php';

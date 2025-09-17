@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\StaffController;
 use App\Http\Controllers\Settings\StoreController;
 use App\Http\Controllers\Settings\TaxController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Middleware\AdminOrManagerOnly;
 
 Route::middleware('auth')->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -14,8 +16,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('settings/store', [StoreController::class, 'edit'])->name('store.edit');
-    Route::patch('/settings/store', [StoreController::class, 'update'])->name('store.update');
+    Route::get('settings/store', [StoreController::class, 'edit'])->middleware(AdminOrManagerOnly::class)->name('store.edit');
+    Route::patch('/settings/store', [StoreController::class, 'update'])->middleware(AdminOrManagerOnly::class)->name('store.update');
     // Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('settings/taxes', [TaxController::class, 'index'])->name('taxes.index');
@@ -26,6 +28,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
+
+    Route::resource('staff', StaffController::class)->middleware(AdminOrManagerOnly::class)->only(['index', 'store', 'update', 'destroy']);
 
     Route::get('settings/appearance', function () {
         return Inertia::render('settings/appearance');

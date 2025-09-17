@@ -8,12 +8,15 @@ use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\DiningTableController;
 use App\Http\Controllers\Api\ApiDiningTableController;
 use App\Http\Controllers\NewBill\OrderController;
+use App\Http\Controllers\NewBill\OrderHistoryController;
+use App\Http\Controllers\NewBill\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\Settings\RestaurantSwitchController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use App\Http\Middleware\AdminOrManagerOnly;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -54,9 +57,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // dining tables
     Route::get('/dining-tables', [DiningTableController::class, 'index'])->name('dining.tables.index');
+    Route::post('/dining-tables', [DiningTableController::class, 'store'])->name('dining-tables.store');
+    Route::put('/dining-tables/{dining_table}', [DiningTableController::class, 'update'])->name('dining-tables.update');
+
 
     // routes/web.php
-    Route::get('/restaurants/view', [RestaurantController::class, 'index'])->name('restaurants.index');
+    Route::get('/restaurants/view', [RestaurantController::class, 'index'])->middleware(AdminOrManagerOnly::class)->name('restaurants.index');
 
     // here is api call
     // Route::middleware('api')->group(function () {
@@ -70,6 +76,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/orders/view', [OrderController::class, 'viewOderPage'])->name('orders.view');
     Route::get('/orders-view', [OrderController::class, 'viewOderPage'])->name('orders.view.search');
     Route::patch('/orders-type/{order}', [OrderController::class, 'updateOrderType'])->name('orders.type.update');
+
+    //order history
+    Route::get('/order-history', [OrderHistoryController::class, 'viewOrderHistory'])->name('order.history');
+
+    //payments
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
 });
 
 require __DIR__ . '/settings.php';

@@ -50,7 +50,7 @@ export default function StoreEdit() {
             <Head title="Store Settings" />
 
             <SettingsLayout>
-                <div className="space-y-6">
+                <div className="space-y-6 max-w-xl ">
                     <HeadingSmall title="Store Information" description="Update your store details" />
 
                     <form onSubmit={submit} className="space-y-6">

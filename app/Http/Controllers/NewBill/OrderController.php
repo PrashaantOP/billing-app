@@ -18,6 +18,7 @@ class OrderController extends Controller
 {
     public function store(Request $request)
     {
+        // dd($request->all());
         $data = $request->validate([
             'order_type' => 'required|in:dinein,takeaway,delivery',
             'dining_table_id' => 'nullable|exists:dining_tables,id',
@@ -131,28 +132,35 @@ class OrderController extends Controller
     public function viewOderPage(Request $request)
     {
         $restaurantId = session('current_restaurant_id');
-
         $search = $request->input('search');
 
-        $ordersQuery = Order::where('restaurant_id', $restaurantId)
+        $ordersQuery = \App\Models\Order::where('restaurant_id', $restaurantId)
+            ->where('status', '!=', 'completed')
             ->with('customer', 'diningTable');
 
         if ($search) {
-            $ordersQuery->whereHas('customer', function ($q) use ($search) {
-                $q->where('name', 'like', "%$search%")
-                    ->orWhere('phone', 'like', "%$search%");
+            $ordersQuery->where(function ($query) use ($search) {
+                // Search in customer name or phone
+                $query->whereHas('customer', function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                        ->orWhere('phone', 'like', "%$search%");
+                })
+                    // Or match by order_number directly
+                    ->orWhere('order_number', 'like', "%$search%");
             });
         }
 
-        $orders = $ordersQuery->latest()->paginate(3)->withQueryString();
+        $orders = $ordersQuery->latest()->paginate(6)->withQueryString();
 
-        return Inertia::render('backend/orders/OrderMain', [
+        return \Inertia\Inertia::render('backend/orders/OrderMain', [
             'orders' => $orders,
             'filters' => [
                 'search' => $search,
             ],
         ]);
     }
+
+
 
     public function updateOrderType(Request $request, Order $order)
     {

@@ -26,7 +26,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Orders',
-        href: '/orders/view',
+        href: '/order-history',
         icon: PackageCheck,
     },
     {
@@ -76,36 +76,36 @@ const mainNavItems: NavItem[] = [
     // },
 ];
 
-const companies: CompItem[] = [
-    {
-        name: "Acme Inc",
-        logo: GalleryVerticalEnd,
-        plan: "Enterprise",
-      },
-      {
-        name: "Acme Corp.",
-        logo: AudioWaveform,
-        plan: "Startup",
-      },
-      {
-        name: "Evil Corp.",
-        logo: Command,
-        plan: "Free",
-      },
-];
+// const companies: CompItem[] = [
+//     {
+//         name: "Acme Inc",
+//         logo: GalleryVerticalEnd,
+//         plan: "Enterprise",
+//       },
+//       {
+//         name: "Acme Corp.",
+//         logo: AudioWaveform,
+//         plan: "Startup",
+//       },
+//       {
+//         name: "Evil Corp.",
+//         logo: Command,
+//         plan: "Free",
+//       },
+// ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
-    },
-];
+// const footerNavItems: NavItem[] = [
+//     {
+//         title: 'Repository',
+//         href: 'https://github.com/laravel/react-starter-kit',
+//         icon: Folder,
+//     },
+//     {
+//         title: 'Documentation',
+//         href: 'https://laravel.com/docs/starter-kits',
+//         icon: BookOpen,
+//     },
+// ];
 
 export function AppSidebar() {
     return (

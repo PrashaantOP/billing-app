@@ -13,7 +13,7 @@ type Props = {
 
 const FloatingCartToggle: React.FC<Props> = ({ selectedItems, cartOpen, setCartOpen, totalItems, handleSaveOrder }) => {
   return (
-    <div className="fixed bottom-4 right-0 z-5 flex items-center justify-center lg:justify-end px-0 lg:px-10 gap-3 w-full">
+    <div className="fixed bottom-4 right-0 z-5 flex items-center justify-center lg:justify-end px-0 lg:px-10 gap-3 w-full select-none">
       <AnimatePresence>
         {selectedItems.length > 0 && !cartOpen && (
           <motion.div

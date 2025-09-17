@@ -49,6 +49,7 @@ class HandleInertiaRequests extends Middleware
                 'restaurants' => $request->user()?->restaurants()->select('restaurants.id', 'restaurants.name', 'restaurants.address')->get() ?? [],
                 'current_restaurant_id' => Session::get('current_restaurant_id'),
             ],
+            'current_role' => fn() => Session::get('current_role'),
             'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

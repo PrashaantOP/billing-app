@@ -2,7 +2,7 @@ import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSep
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { type User } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Gem, LogOut, Settings, Store } from 'lucide-react';
 import { router } from '@inertiajs/react';
 
@@ -21,7 +21,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             preserveState: false, // forces fresh data load
         });
     };
-
+    const { current_role } = usePage().props;
     return (
         <>
             <DropdownMenuLabel className="p-0 font-normal">
@@ -38,13 +38,17 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 </button>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                <button className="block w-full" onClick={(e) => handleClick(e, 'restaurants.index')}>
-                    <Store className="mr-2" />
-                    Restaurants
-                </button>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                {current_role == 'admin' && (
+          <>
+            <DropdownMenuItem asChild>
+              <button className="block w-full" onClick={(e) => handleClick(e, 'restaurants.index')}>
+                <Store className="mr-2" />
+                Restaurants
+              </button>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
                 <DropdownMenuItem asChild>
                 <button className="block w-full" onClick={(e) => handleClick(e, 'profile.edit')}>
                     <Settings className="mr-2" />

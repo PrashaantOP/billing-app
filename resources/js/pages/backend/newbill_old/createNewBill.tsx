@@ -606,7 +606,7 @@ console.log('Total with tax:', totalTax.toFixed(2));
 
                 <div className={`fixed w-full top-2 bottom-2 right-0 lg:right-3 sm:w-96 lg:max-w-xl lg:w-100 lg:rounded-md bg-white shadow-lg z-4 transform transition-transform duration-300 h-full  ${cartOpen ? 'translate-x-0 block ' : 'translate-x-full hidden'}`}>
                         <div className="flex justify-between items-center p-4 border-b">
-                        <h2 className="text-xl font-bold flex flex-row items-center justify-start gap-2"> Cart</h2>
+                        <h2 className="text-xl font-bold flex flex-row items-center justify-start gap-2 select-none"> Cart</h2>
                         <button onClick={() => setCartOpen(false)}><X className="w-5 h-5 cursor-pointer" /></button>
                         </div>
 
@@ -839,7 +839,7 @@ console.log('Total with tax:', totalTax.toFixed(2));
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.5 }}
                                             transition={{ duration: 0.4, ease: "easeOut" }}
-                                            className=" bg-green-600 text-white rounded-full px-1 py-1 shadow-xl flex items-center space-x-3  cursor-pointer"
+                                            className="select-none bg-green-600 text-white rounded-full px-1 py-1 shadow-xl flex items-center space-x-3  cursor-pointer"
                                             onClick={() => setCartOpen(true)}
                                             >
                                                 <motion.div

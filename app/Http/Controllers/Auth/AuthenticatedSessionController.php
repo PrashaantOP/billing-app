@@ -31,23 +31,23 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        // Set current restaurant in session — for example, the first one user is linked with
         $user = $request->user();
 
-
-        $restaurant = $user->restaurants()->wherePivot('is_active', true)->first(); // or pick based on your logic
+        $restaurant = $user->restaurants()->wherePivot('is_active', true)->first(); // ya koi bhi logic
         if ($restaurant) {
             Session::put('current_restaurant_id', $restaurant->id);
             Session::put('switched_restaurant', $restaurant);
-        }
 
-        // end restaurant session id 
+            // --- Store Role In Session Here ---
+            $role = $restaurant->pivot->role ?? null;
+            Session::put('current_role', $role);
+        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
+
 
     /**
      * Destroy an authenticated session.

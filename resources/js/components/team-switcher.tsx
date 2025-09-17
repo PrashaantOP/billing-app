@@ -68,7 +68,7 @@ export function TeamSwitcher() {
     }
   );
 };
-
+const { current_role } = usePage().props;
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -114,6 +114,8 @@ export function TeamSwitcher() {
               </DropdownMenuItem>
               
             ))}
+            {current_role == 'admin' && (
+          <>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-2 p-2">
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
@@ -121,6 +123,8 @@ export function TeamSwitcher() {
               </div>
               <div className="font-medium text-muted-foreground">Add restaurant</div>
             </DropdownMenuItem>
+            </>
+        )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

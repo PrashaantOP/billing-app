@@ -40,7 +40,7 @@ export default function TaxManagement() {
             <Head title="Tax Settings" />
 
             <SettingsLayout>
-                <div className="space-y-6">
+                <div className="space-y-6 max-w-xl ">
                   <div className="flex flex-row items-center justify-between">
                       <div className="flex w-1/2">
                       <HeadingSmall title="Manage Taxes" description="Add or update your taxes" />

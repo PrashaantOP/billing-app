@@ -102,7 +102,7 @@ type Tax = {
   }: CartSidebarProps) {
     return (
     <div
-      className={`fixed w-full top-2 bottom-2 right-0 lg:right-3 sm:w-96 lg:max-w-xl lg:w-100 lg:rounded-md bg-white shadow-lg z-4 transform transition-transform duration-300 h-full  ${
+      className={`select-none fixed w-full top-2 bottom-2 right-0 lg:right-3 sm:w-96 lg:max-w-xl lg:w-100 lg:rounded-md bg-white shadow-lg z-4 transform transition-transform duration-300 h-full  ${
         cartOpen ? 'translate-x-0 block' : 'translate-x-full hidden'
       }`}
     >

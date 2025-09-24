@@ -82,6 +82,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //payments
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    // Payment status update route for order
+    Route::put('/orders/{order}/update-payment-status', [OrderController::class, 'updatePaymentStatus'])
+        ->name('orders.update-payment-status');
 });
 
 require __DIR__ . '/settings.php';

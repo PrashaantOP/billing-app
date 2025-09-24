@@ -59,11 +59,11 @@ const mainNavItems: NavItem[] = [
     //     href: '/settings/taxes',
     //     icon: Percent,
     // },
-    {
-        title: 'Logs',
-        href: '/logs',
-        icon: History,
-    },
+    // {
+    //     title: 'Logs',
+    //     href: '/logs',
+    //     icon: History,
+    // },
     // {
     //     title: 'Restaurant Settings',
     //     href: '/restaurants/view',

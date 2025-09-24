@@ -15,7 +15,7 @@ class OrderHistoryController extends Controller
 
         $search = $request->input('search');
 
-        $ordersQuery = \App\Models\Order::where('restaurant_id', $restaurantId)
+        $ordersQuery = \App\Models\Order::where('restaurant_id', $restaurantId)->with('items.menuItem')
             ->where('status', 'completed') // ADD THIS LINE for completed orders only
             ->with('customer', 'diningTable');
 

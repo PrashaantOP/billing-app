@@ -98,7 +98,7 @@ const [paymentMethod, setPaymentMethod] = useState('');
 const [transactionId, setTransactionId] = useState('');
 const [isReceived, setIsReceived] = useState(false);
 
-
+const [isSaving, setIsSaving] = useState(false); //order confirm
 
 //discount
 const [applyDiscount, setApplyDiscount] = useState(false);
@@ -467,7 +467,16 @@ const totalTax = taxes.reduce((sum, tax) => {
 const totalWithTax = discountedTotal + totalTax;
 // console.log('Total with tax:', totalTax.toFixed(2));
 console.log(bills);
+
+const playOrderConfirmSound = () => {
+  const audio = new Audio('/assets/sounds/order-create.mp3'); // path to your audio file
+  audio.play();
+}
+
+
 const handleSaveOrder = () => {
+  setIsSaving(true);
+
   const bill = bills.find(b => b.id === activeBillId);
   if (!bill || bill.items.length === 0) {
     alert('No items to save.');
@@ -507,13 +516,20 @@ const handleSaveOrder = () => {
 
   router.post('/orders', payload, {
     onError: (errors) => {
+      setIsSaving(false);
       // ✅ Show specific error
       console.error('Validation errors:', errors)
       alert(errors.error || 'Failed to save order.')
     },
     onSuccess: () => {
+
+      // ✅ Play confirmation sound
+      playOrderConfirmSound();
+
       // ✅ Optional: clear cart, show toast, etc.
       toast.success('Order successfully created!')
+
+      setIsSaving(false);
       // ✅ Reset bills state
     const defaultBill = {
         id: Date.now(),
@@ -628,6 +644,7 @@ const handleSaveOrder = () => {
   setCartOpen={setCartOpen}
   totalItems={totalItems}
   handleSaveOrder={handleSaveOrder}
+  isSaving={isSaving}
 />
 
                 </div>

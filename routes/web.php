@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\DiningTableController;
 use App\Http\Controllers\Api\ApiDiningTableController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NewBill\OrderController;
 use App\Http\Controllers\NewBill\OrderHistoryController;
 use App\Http\Controllers\NewBill\PaymentController;
@@ -27,9 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/restaurant/switch', [RestaurantSwitchController::class, 'switchRestaurant'])->middleware('auth');
 
 
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 
 
     Route::get('plans', [PlansController::class, 'viewPlans'])->name('plans');

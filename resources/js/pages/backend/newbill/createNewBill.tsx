@@ -466,7 +466,7 @@ const totalTax = taxes.reduce((sum, tax) => {
 //  Final Total
 const totalWithTax = discountedTotal + totalTax;
 // console.log('Total with tax:', totalTax.toFixed(2));
-console.log(bills);
+// console.log(bills);
 
 const playOrderConfirmSound = () => {
   const audio = new Audio('/assets/sounds/order-create.mp3'); // path to your audio file
@@ -519,7 +519,8 @@ const handleSaveOrder = () => {
       setIsSaving(false);
       // ✅ Show specific error
       console.error('Validation errors:', errors)
-      alert(errors.error || 'Failed to save order.')
+      // alert(errors.error || 'Failed to save order.')
+      toast.error(errors.error || 'Failed to save order.');
     },
     onSuccess: () => {
 
@@ -527,7 +528,7 @@ const handleSaveOrder = () => {
       playOrderConfirmSound();
 
       // ✅ Optional: clear cart, show toast, etc.
-      toast.success('Order successfully created!')
+      
 
       setIsSaving(false);
       // ✅ Reset bills state
@@ -554,6 +555,10 @@ const handleSaveOrder = () => {
       localStorage.removeItem('bills')
       localStorage.removeItem('activeBillId')
       localStorage.setItem('billCounter', '2')
+
+      //visit to orders page
+      router.visit('/orders/view');
+      toast.success('Order successfully created!');
     //   alert('Order saved successfully.')
     },
   })
@@ -564,6 +569,8 @@ const handleSaveOrder = () => {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create new order" />
+
+            
 
             <NewBillLayout categories={categories}>
                 {/* new tab start  */}

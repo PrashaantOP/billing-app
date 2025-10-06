@@ -29,16 +29,48 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $validated = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Handle image upload/removal
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if (!empty($user->image) && file_exists(public_path($user->image))) {
+                @unlink(public_path($user->image));
+            }
+
+            $imageFile = $request->file('image');
+            $filename = 'user_' . $user->id . '_' . time() . '.' . $imageFile->getClientOriginalExtension();
+            $destinationPath = public_path('assets/images/users');
+            $relativePath = $filename;
+
+            // Create directory if it doesn't exist
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            // Move new image
+            $imageFile->move($destinationPath, $filename);
+            $validated['image'] = $relativePath;
+        } elseif ($request->has('remove_image') && $request->input('remove_image')) {
+            // Remove image
+            if (!empty($user->image) && file_exists(public_path($user->image))) {
+                @unlink(public_path($user->image));
+            }
+            $validated['image'] = null;
         }
 
-        $request->user()->save();
+        $user->fill($validated);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return to_route('profile.edit');
     }
+
 
     /**
      * Delete the user's account.

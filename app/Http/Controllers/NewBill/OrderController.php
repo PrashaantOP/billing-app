@@ -201,7 +201,7 @@ class OrderController extends Controller
                 // $payment->amount_paid = $yourPartialAmount;
             } else { // pending
                 $payment->amount_paid = 0;
-                $payment->status = 'not paid';
+                $payment->status = 'paid';
             }
             $payment->payment_date = now();
             $payment->save();

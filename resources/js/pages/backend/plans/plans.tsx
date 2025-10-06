@@ -1,39 +1,35 @@
 import AppLayout from '@/layouts/app-layout'
 import { CheckIcon } from '@heroicons/react/20/solid'
-
-const tiers = [
-  {
-    name: 'Free',
-    id: 'tier-hobby',
-    href: '#',
-    priceMonthly: '₹0',
-    description: "The perfect plan if you're just getting started with our product.",
-    features: ['25 products', 'Up to 10,000 subscribers', 'Advanced analytics', '24-hour support response time'],
-    featured: false,
-  },
-  {
-    name: 'Primium',
-    id: 'tier-enterprise',
-    href: '#',
-    priceMonthly: '₹249',
-    description: 'Dedicated support and infrastructure for your company.',
-    features: [
-      'Unlimited products',
-      'Unlimited subscribers',
-      'Advanced analytics',
-      'Dedicated support representative',
-      'Marketing automations',
-      'Custom integrations',
-    ],
-    featured: true,
-  },
-]
+import { usePage } from '@inertiajs/react'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
 export default function plans() {
+  const { plans } = usePage().props
+
+  // Create tiers array from database plans
+  const tiers = plans.map((plan, index) => ({
+    name: plan.name,
+    id: `tier-${plan.id}`,
+    href: '#',
+    priceMonthly: plan.monthly_price > 0 ? `₹${plan.monthly_price}` : `₹${plan.yearly_price}`,
+    description: plan.description,
+    features: [
+      `${plan.max_restaurants} restaurant${plan.max_restaurants > 1 ? 's' : ''}`,
+      `Up to ${plan.max_users_per_restaurant} users per restaurant`,
+      `${plan.max_menu_items || 'Unlimited'} menu items`,
+      `${plan.max_orders_per_month} orders per month`,
+      'Customer management',
+      'Order management',
+      'Menu management',
+      'Basic reports',
+      'Basic support'
+    ],
+    featured: index === 1, // Second plan will be featured
+  }))
+
   return (
     <AppLayout>
     <div className="relative isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
@@ -53,8 +49,7 @@ export default function plans() {
         </p>
       </div>
       <p className="mx-auto mt-6 max-w-2xl text-center text-lg font-medium text-pretty text-gray-600 sm:text-xl/8">
-        Choose an affordable plan that’s packed with the best features for engaging your audience, creating customer
-        loyalty, and driving sales.
+        Choose an affordable plan that's packed with the best features for managing your restaurant, engaging customers, and driving sales.
       </p>
       <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
         {tiers.map((tier, tierIdx) => (
@@ -72,22 +67,23 @@ export default function plans() {
           >
             <h3
               id={tier.id}
-              className={classNames(tier.featured ? 'text-red-400' : 'text-red-600', 'text-base/7 font-semibold')}
+              className={classNames(tier.featured ? 'text-red-400 text-base/7 font-semibold' : 'text-red-600 text-sm/7 font-semibold')}
             >
               {tier.name}
             </h3>
             <p className="mt-4 flex items-baseline gap-x-2">
               <span
                 className={classNames(
-                  tier.featured ? 'text-white' : 'text-gray-900',
-                  'text-5xl font-semibold tracking-tight',
+                  tier.featured ? 'text-white text-5xl font-semibold tracking-tight' : 'text-gray-900 text-3xl font-semibold tracking-tight'
                 )}
               >
                 {tier.priceMonthly}
               </span>
-              <span className={classNames(tier.featured ? 'text-gray-400' : 'text-gray-500', 'text-base')}>/month</span>
+              <span className={classNames(tier.featured ? 'text-gray-400' : 'text-gray-500', 'text-base')}>
+                {tier.priceMonthly.includes('9990') ? '/year' : '/month'}
+              </span>
             </p>
-            <p className={classNames(tier.featured ? 'text-gray-300' : 'text-gray-600', 'mt-6 text-base/7')}>
+            <p className={classNames(tier.featured ? 'text-gray-300 mt-6 text-base/7' : 'text-gray-600 text-xs/6 mt-2')}>
               {tier.description}
             </p>
             <ul

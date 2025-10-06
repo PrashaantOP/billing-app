@@ -31,8 +31,24 @@ export default function NewBillLayout({ children, categories }: NewBillLayoutPro
 
 
     return (
-        <div className="px-4 py-6">
+        <div className="px-4 py-6 select-none">
             <Heading title="New Bill" description="Create new bills and print this" />
+            <div className="flex items-center justify-end">
+                {/* two buttons running order, complete order */}
+                {/* <button
+                    onClick={() => router.visit('/orders/view')}
+                    className="mb-4 rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                >
+                    Running Orders
+                </button>
+                <button
+                    onClick={() => router.visit('/orders/completed')}
+                    className="mb-4 ml-2 rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                >
+                    Completed Orders
+                </button> */}
+            </div>
+            
 
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
             <aside className="w-full max-w-xl lg:w-48">
@@ -40,6 +56,7 @@ export default function NewBillLayout({ children, categories }: NewBillLayoutPro
             {/* <div className='mb-4'>
                 <AddNewCategory varient='link' size='nopd' />
             </div> */}
+            
             <div className="mb-4 px-2 flex flex-row items-center justify-start gap-1 rounded-md bg-white border border-gray-300">
                 <Search className="h-4 w-4 text-gray-400" />
                 <Input

@@ -78,9 +78,7 @@ export default function Landing() {
         {/* Navigation + Hero */}
         <header className="w-full py-6 px-3 max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 text-xl font-black tracking-tight text-red-600">
-            <svg className="w-7 h-7" viewBox="0 0 32 32" fill="currentColor">
-              <circle cx="16" cy="16" r="16" />
-            </svg>
+            <img src="/assets/images/logos/biglogopng.png" alt="" className='w-10 h-10' />
             Billify
           </div>
           <nav className="flex gap-3">

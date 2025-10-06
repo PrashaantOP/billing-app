@@ -6,8 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Restaurant extends Model
 {
-    protected $fillable = ['name', 'email', 'phone', 'address', 'gst_no'];
+    protected $fillable = [
+        'name',
+        'logo',
+        'email',
+        'phone',
+        'address',
+        'gst_no',
+        'is_active',
+        'suspended_at',
+        'suspension_reason'
+    ];
 
+    // Pivot relation for users
     public function users()
     {
         return $this->belongsToMany(User::class)
@@ -59,5 +70,11 @@ class Restaurant extends Model
     public function orderTaxes()
     {
         return $this->hasMany(OrderTax::class);
+    }
+
+    /*** Subscription Feature Usage Relation ***/
+    public function featureUsages()
+    {
+        return $this->hasMany(FeatureUsage::class);
     }
 }

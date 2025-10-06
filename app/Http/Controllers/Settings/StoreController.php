@@ -25,22 +25,51 @@ class StoreController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'store_name' => 'required|string|max:255',
-            'store_email' => 'nullable|email',
-            'store_phone' => 'nullable|string|max:20',
+            'store_name'    => 'required|string|max:255',
+            'store_email'   => 'nullable|email',
+            'store_phone'   => 'nullable|string|max:20',
             'store_address' => 'nullable|string',
-            'store_gst_no' => 'nullable|string|max:50',
+            'store_gst_no'  => 'nullable|string|max:50',
+            'logo'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:512', // max 500KB
         ]);
 
-        $rastaurant = session('switched_restaurant');
+        $restaurant = session('switched_restaurant');
+        $updateData = [
+            'name'     => $request->store_name,
+            'email'    => $request->store_email,
+            'phone'    => $request->store_phone,
+            'address'  => $request->store_address,
+            'gst_no'   => $request->store_gst_no,
+        ];
 
-        $rastaurant->update([
-            'name' => $request->store_name,
-            'email' => $request->store_email,
-            'phone' => $request->store_phone,
-            'address' => $request->store_address,
-            'gst_no' => $request->store_gst_no,
-        ]);
+        // Custom Logo Handling
+        if ($request->hasFile('logo')) {
+            $logoFile = $request->file('logo');
+            $filename = 'logo_' . uniqid() . '.' . $logoFile->getClientOriginalExtension();
+            $destinationPath = public_path('assets/images/logos');
+            $relativePath = $filename;
+
+            // Delete previous logo if exists and not default
+            if (!empty($restaurant->logo) && file_exists(public_path($restaurant->logo))) {
+                @unlink(public_path($restaurant->logo));
+            }
+
+            // Move new logo
+            $logoFile->move($destinationPath, $filename);
+
+            $updateData['logo'] = $relativePath;
+        }
+
+        if ($request->has('remove_logo') && $request->input('remove_logo')) {
+            // Remove file from server
+            if (!empty($restaurant->logo) && file_exists(public_path($restaurant->logo))) {
+                @unlink(public_path($restaurant->logo));
+            }
+            $updateData['logo'] = null; // Remove logo path from DB
+        }
+
+
+        $restaurant->update($updateData);
 
         return back()->with('success', 'Restaurant updated.');
     }

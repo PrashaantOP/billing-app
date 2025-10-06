@@ -18,7 +18,7 @@ const OrderTypeSwitcher = ({
 
   useEffect(() => {
     if (orderType === 'dinein') {
-        setOrderType('dinein');
+      setOrderType('dinein');
       fetchDiningTables();
     } else {
       // reset selectedTable when not dinein
@@ -65,7 +65,7 @@ const OrderTypeSwitcher = ({
           <select
             value={selectedTable}
             onChange={(e) => setSelectedTable(e.target.value)}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm dark:bg-neutral-800 dark:text-white dark:border-neutral-600"
+            className="block w-full px-3 py-2 border border-gray-300 dark:border-neutral-600 rounded-md shadow-sm bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
           >
             <option value="">-- Select Table --</option>
             {loading ? (

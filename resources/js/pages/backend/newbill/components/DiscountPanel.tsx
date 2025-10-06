@@ -26,10 +26,10 @@ export default function DiscountPanel({
               }
               handleDiscountChange(isChecked, 'percent', '')
             }}
-            className="w-5 h-5 text-green-600 accent-green-600"
+            className="w-5 h-5 text-green-600 accent-green-600 dark:accent-green-400"
           />
           <span
-            className={`${applyDiscount ? 'text-green-600' : 'text-red-500'} font-medium`}
+            className={`${applyDiscount ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'} font-medium`}
           >
             Discount
           </span>
@@ -45,7 +45,7 @@ export default function DiscountPanel({
               setDiscountType(newType)
               handleDiscountChange(applyDiscount, newType, discountValue)
             }}
-            className="px-2 py-2 border rounded-md"
+            className="px-2 py-2 border border-gray-300 dark:border-neutral-600 rounded-md bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
           >
             <option value="percent">%</option>
             <option value="fixed">₹</option>
@@ -58,7 +58,7 @@ export default function DiscountPanel({
               setDiscountValue(val)
               handleDiscountChange(applyDiscount, discountType, val)
             }}
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-600 rounded-md bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
             placeholder={discountType === 'percent' ? 'Enter %' : 'Enter ₹ amount'}
           />
         </li>
@@ -67,12 +67,12 @@ export default function DiscountPanel({
       {applyDiscount && (
         <li className="flex justify-between gap-4 items-center">
           <div className="flex">
-            <span className="text-xs">Discount</span>
-            <span className="text-xs ml-2">
+            <span className="text-xs text-gray-600 dark:text-gray-300">Discount</span>
+            <span className="text-xs ml-2 text-gray-600 dark:text-gray-300">
               ({discountType === 'percent' ? `${discountValue}%` : `₹${discountValue}`})
             </span>
           </div>
-          <span className="text-xs font-semibold text-red-600">
+          <span className="text-xs font-semibold text-red-600 dark:text-red-400">
             - ₹{discountAmount.toFixed(2)}
           </span>
         </li>

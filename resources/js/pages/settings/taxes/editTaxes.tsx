@@ -145,7 +145,7 @@ export default function EditTaxes({ taxes }: { taxes: TaxesType }) {
                                 id="is_inclusive"
                                 checked={data.is_inclusive}
                                 onChange={(e) => {
-                                    console.log('Checked:', e.target.checked);
+                                    // console.log('Checked:', e.target.checked);
                                     setData('is_inclusive', e.target.checked);
                                 }}
                                 className="peer sr-only"

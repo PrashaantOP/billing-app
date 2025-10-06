@@ -94,11 +94,12 @@ export default function SearchAddUpdateSelectCustomer() {
                 <DialogTrigger asChild>
                     {/* <Button variant="destructive">Add Customer Details</Button> */}
                     <button
-                    className="flex items-center gap-2 w-full px-4 py-2 border border-gray-300 rounded-t-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-200"
+                    className="flex items-center gap-2 w-full px-4 py-2 border border-gray-300 dark:border-neutral-600 rounded-t-md shadow-sm bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-red-200 dark:focus:ring-red-500/50"
                     >
-                    <UserPlus className="w-5 h-5 text-gray-500" />
+                    <UserPlus className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     <span className="text-sm">Customer</span>
                     </button>
+
                 </DialogTrigger>
                 <DialogContent>
                     <DialogTitle>Add Customer Details</DialogTitle>
@@ -115,17 +116,18 @@ export default function SearchAddUpdateSelectCustomer() {
                                 placeholder="Phone Number"
                             />
                             {suggestions.length > 0 && (
-                                <ul className="absolute z-10 w-full bg-white border rounded shadow max-h-40 overflow-auto">
+                                <ul className="absolute z-10 w-full bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded shadow max-h-40 overflow-auto">
                                     {suggestions.map((cust) => (
                                         <li
-                                            key={cust.id}
-                                            onClick={() => handleSelectSuggestion(cust)}
-                                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                                        key={cust.id}
+                                        onClick={() => handleSelectSuggestion(cust)}
+                                        className="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-800 text-sm text-gray-700 dark:text-gray-200"
                                         >
-                                            {cust.phone} - {cust.name}
+                                        {cust.phone} - {cust.name}
                                         </li>
                                     ))}
                                 </ul>
+
                             )}
                             <InputError message={errors.phone} />
                         </div>

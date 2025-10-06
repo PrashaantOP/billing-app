@@ -102,16 +102,18 @@ type Tax = {
   }: CartSidebarProps) {
     return (
     <div
-      className={`select-none fixed w-full top-2 bottom-2 right-0 lg:right-3 sm:w-96 lg:max-w-xl lg:w-100 lg:rounded-md bg-white shadow-lg z-4 transform transition-transform duration-300 h-full  ${
-        cartOpen ? 'translate-x-0 block' : 'translate-x-full hidden'
-      }`}
-    >
-      <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-xl font-bold">Cart</h2>
+  className={`select-none fixed w-full top-2 bottom-2 right-0 lg:right-3 sm:w-96 lg:max-w-xl lg:w-100 lg:rounded-md bg-white dark:bg-neutral-900 shadow-lg z-4 transform transition-transform duration-300 h-full  ${
+    cartOpen ? 'translate-x-0 block' : 'translate-x-full hidden'
+  }`}
+>
+
+      <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Cart</h2>
         <button onClick={() => setCartOpen(false)}>
-          <X className="w-5 h-5 cursor-pointer" />
+          <X className="w-5 h-5 cursor-pointer text-gray-600 hover:text-red-600 dark:text-gray-300 dark:hover:text-red-400 transition-colors" />
         </button>
       </div>
+
       <div className='p-4 overflow-y-auto'>
         <OrderTypeSwitcher
           orderType={orderType}
@@ -121,15 +123,11 @@ type Tax = {
         />
       </div>
 
-      <div className="p-4 overflow-y-auto h-[calc(100%-100px)]">
+      <div className="p-4 overflow-y-auto h-[calc(100%-200px)] max-h-screen">
         {selectedItems.length > 0 ? (
-          <ul className="space-y-3">
-            <CartItemList
-              items={selectedItems}
-              increaseQty={increaseQty}
-              decreaseQty={decreaseQty}
-              removeItem={removeItem}
-            />
+          <ul className="space-y-3 pb-20">
+            <CustomerInfo activeBill={activeBill} />
+            
 
             <DiscountPanel
               applyDiscount={applyDiscount}
@@ -159,8 +157,13 @@ type Tax = {
               handlePaymentMethodChange={handlePaymentMethodChange}
               handleTransactionIdChange={handleTransactionIdChange}
             />
-
-            <CustomerInfo activeBill={activeBill} />
+            <CartItemList
+              items={selectedItems}
+              increaseQty={increaseQty}
+              decreaseQty={decreaseQty}
+              removeItem={removeItem}
+            />
+            
           </ul>
         ) : (
           <p className="text-gray-400 mt-10 text-center">No items selected.</p>

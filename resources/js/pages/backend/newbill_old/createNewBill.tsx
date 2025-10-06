@@ -471,7 +471,7 @@ const totalTax = taxes.reduce((sum, tax) => {
 //  Final Total
 const totalWithTax = discountedTotal + totalTax;
 
-console.log('Total with tax:', totalTax.toFixed(2));
+// console.log('Total with tax:', totalTax.toFixed(2));
 
 
     return (

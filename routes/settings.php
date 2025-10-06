@@ -13,11 +13,14 @@ Route::middleware('auth')->group(function () {
     Route::redirect('settings', 'settings/profile');
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::match(['patch', 'post'], '/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('settings/store', [StoreController::class, 'edit'])->middleware(AdminOrManagerOnly::class)->name('store.edit');
-    Route::patch('/settings/store', [StoreController::class, 'update'])->middleware(AdminOrManagerOnly::class)->name('store.update');
+    Route::match(['patch', 'post'], '/settings/store', [StoreController::class, 'update'])
+        ->middleware(AdminOrManagerOnly::class)
+        ->name('store.update');
     // Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('settings/taxes', [TaxController::class, 'index'])->name('taxes.index');

@@ -29,12 +29,19 @@ return new class extends Migration
         Schema::create('restaurants', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('logo')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->string('gst_no')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamp('suspended_at')->nullable();
+            $table->text('suspension_reason')->nullable();
             $table->timestamps();
         });
+
+
+
 
         // Users
         Schema::create('users', function (Blueprint $table) {
@@ -48,8 +55,78 @@ return new class extends Migration
             $table->timestamp('otp_expires_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->unsignedBigInteger('current_subscription_id')->nullable();
+            $table->enum('account_type', ['free', 'premium'])->default('free');
+            $table->timestamp('trial_ends_at')->nullable();
+            $table->boolean('is_trial_used')->default(false);
             $table->timestamps();
         });
+
+
+        //subscriptions structure
+
+        // 1. Subscription Plans
+        Schema::create('subscription_plans', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->decimal('monthly_price', 10, 2);
+            $table->decimal('yearly_price', 10, 2);
+            $table->json('features');
+            $table->integer('max_restaurants')->nullable();
+            $table->integer('max_users_per_restaurant')->nullable();
+            $table->integer('max_menu_items')->nullable();
+            $table->integer('max_orders_per_month')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+
+        // 2. User Subscriptions
+        Schema::create('user_subscriptions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('subscription_plan_id')->constrained();
+            $table->enum('billing_cycle', ['monthly', 'yearly']);
+            $table->date('starts_at');
+            $table->date('ends_at');
+            $table->date('next_billing_date')->nullable();
+            $table->enum('status', ['active', 'cancelled', 'expired', 'suspended'])->default('active');
+            $table->decimal('amount', 10, 2);
+            $table->boolean('auto_renew')->default(true);
+            $table->timestamp('cancelled_at')->nullable();
+            $table->text('cancellation_reason')->nullable();
+            $table->timestamps();
+        });
+
+        // 3. Subscription Payments
+        Schema::create('subscription_payments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_subscription_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained();
+            $table->string('payment_id')->unique();
+            $table->decimal('amount', 10, 2);
+            $table->string('currency', 3)->default('INR');
+            $table->enum('status', ['pending', 'completed', 'failed', 'refunded']);
+            $table->string('payment_method')->nullable();
+            $table->json('payment_response')->nullable();
+            $table->date('billing_date');
+            $table->timestamps();
+        });
+
+        // 4. Feature Usage Tracking
+        Schema::create('feature_usage', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('restaurant_id')->constrained();
+            $table->string('feature');
+            $table->integer('usage_count')->default(0);
+            $table->date('usage_date');
+            $table->timestamps();
+
+            $table->index(['user_id', 'restaurant_id', 'feature', 'usage_date']);
+        });
+
+        // subscriptions structure end
 
         // Tables (seating)
         Schema::create('dining_tables', function (Blueprint $table) {
@@ -165,7 +242,7 @@ return new class extends Migration
             $table->unsignedBigInteger('order_id');
             $table->date('payment_date');
             $table->decimal('amount_paid', 10, 2);
-            $table->string('payment_method');
+            $table->string('payment_method')->default('Cash');
             $table->string('transaction_reference')->nullable();
             $table->enum('status', ['paid', 'partial']);
             $table->text('notes')->nullable();
@@ -203,6 +280,10 @@ return new class extends Migration
         Schema::dropIfExists('customers');
         Schema::dropIfExists('dining_tables');
         Schema::dropIfExists('users');
+        Schema::dropIfExists('feature_usage');
+        Schema::dropIfExists('subscription_payments');
+        Schema::dropIfExists('user_subscriptions');
+        Schema::dropIfExists('subscription_plans');
         Schema::dropIfExists('restaurants');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');

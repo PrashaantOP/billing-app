@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { AudioWaveform, Check, ChevronsUpDown, Plus } from "lucide-react"
+import { Utensils, Check, ChevronsUpDown, Plus } from "lucide-react"
 import { router, usePage } from '@inertiajs/react'
 import toast from 'react-hot-toast';
 
@@ -27,12 +27,12 @@ export function TeamSwitcher() {
 
   const teams = auth.restaurants.map((restaurant: any) => ({
     name: restaurant.name,
-    logo: AudioWaveform,
+    logo: restaurant.logo ? restaurant.logo : 'smalllogopng.png',
     address: restaurant.address,
     plan: restaurant.id === auth.current_restaurant_id ? 'Current' : 'Available',
     id: restaurant.id,
   }))
-
+// console.log(auth);
   const [activeTeam, setActiveTeam] = React.useState(() =>
     teams.find((team: any) => team.id === auth.current_restaurant_id) || teams[0]
   )
@@ -78,6 +78,10 @@ const { current_role } = usePage().props;
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
+              <div className="bg-transparant text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                {/* <activeTeam.logo className="size-4" /> */}
+                <img src={`/assets/images/logos/${activeTeam.logo}`} alt="" />
+              </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold text-red-600">{activeTeam.name}</span>
                 <span className="truncate text-xs">{activeTeam.address}</span>

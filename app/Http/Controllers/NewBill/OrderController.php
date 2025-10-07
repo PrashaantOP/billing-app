@@ -160,6 +160,16 @@ class OrderController extends Controller
         ]);
     }
 
+    public function getMenuItems($restaurantId)
+    {
+        $menuItems = MenuItem::where('restaurant_id', $restaurantId)
+            ->where('is_available', true)
+            ->select('id', 'name', 'price', 'is_available')
+            ->get();
+
+        return response()->json($menuItems);
+    }
+
 
 
     public function updateOrderType(Request $request, Order $order)

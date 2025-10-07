@@ -26,6 +26,7 @@ class CustomersController extends Controller
         $query = $request->input('phone');
 
         $customers = Customer::where('phone', 'like', "$query%")
+            ->where('restaurant_id', session('current_restaurant_id'))
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get(['id', 'name', 'phone', 'email', 'address']);
@@ -66,7 +67,7 @@ class CustomersController extends Controller
         ]);
 
         // Check if customer with phone exists
-        $customer = Customer::where('phone', $validated['phone'])->first();
+        $customer = Customer::where('phone', $validated['phone'])->where('restaurant_id', session('current_restaurant_id'))->first();
 
         if ($customer) {
             // Update customer if additional fields are provided

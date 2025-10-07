@@ -11,6 +11,7 @@ class DiningTableController extends Controller
     public function index()
     {
         $restaurantId = session('current_restaurant_id');
+        $restaurantName = session('switched_restaurant')->name;
 
         $tables = \App\Models\DiningTable::where('restaurant_id', $restaurantId)
             ->with(['restaurant:id,name', 'currentDineinOrder:id,dining_table_id,status,order_type,order_number'])
@@ -19,9 +20,11 @@ class DiningTableController extends Controller
                 $table->is_reserved = (bool) $table->currentDineinOrder;
                 return $table;
             });
-
+        // dd($tables);
         return Inertia::render('backend/diningTables/mainDiningTable', [
             'tables' => $tables,
+            'restaurantId' => $restaurantId,
+            'restaurantName' => $restaurantName,
         ]);
     }
 

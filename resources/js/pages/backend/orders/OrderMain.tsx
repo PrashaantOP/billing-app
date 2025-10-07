@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { OrderStatus } from './OrderStatus'
 import PaymentStatus from './PaymentStatus'
 import OrderDetailsDialog from '../payments/OrderDetailsModal'
+import AddItemsModal from './AddItemsModal' // Import Add Items Modal
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -24,6 +25,15 @@ const OrderMain = ({ orders, filters }) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
 
+  // Handler and state for Add Items Modal
+  const [addItemsModalOpen, setAddItemsModalOpen] = useState(false)
+  const [selectedOrderForItems, setSelectedOrderForItems] = useState(null)
+
+  const handleAddItems = (order) => {
+    setSelectedOrderForItems(order)
+    setAddItemsModalOpen(true)
+  }
+
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       router.get('/orders-view', { search }, { preserveState: true, replace: true })
@@ -35,6 +45,14 @@ const OrderMain = ({ orders, filters }) => {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Our orders" />
       <OrderDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} order={selectedOrder} />
+      
+      {/* Add Items Modal */}
+      <AddItemsModal
+        open={addItemsModalOpen}
+        onOpenChange={setAddItemsModalOpen}
+        order={selectedOrderForItems}
+      />
+
       <div className="px-4 py-6">
         <Heading title="Orders" description="Manage your orders" />
         <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -58,123 +76,119 @@ const OrderMain = ({ orders, filters }) => {
 
           {/* MOBILE cards */}
           <div className="block md:hidden space-y-3">
-  {orders.data.map((order) => (
-    <div
-      key={order.id}
-      className="bg-white dark:bg-neutral-800 rounded-xl shadow-md border border-gray-100 dark:border-neutral-700 overflow-hidden hover:shadow-lg transition-shadow duration-200"
-    >
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-neutral-700 dark:to-neutral-600 px-4 py-3 border-b border-gray-100 dark:border-neutral-600">
-        <div className="flex justify-between items-center">
-          <div 
-            className="flex-1 cursor-pointer"
-            
-          >
-            <div className="font-bold text-lg text-red-700 dark:text-red-400" onClick={() => { setSelectedOrder(order); setDialogOpen(true); }}>
-              #{order.order_number}
-            </div>
-            <div className="text-xs text-gray-500 dark:text-neutral-400 mt-1">
-              {dayjs(order.created_at).format('DD MMM YYYY, hh:mm A')}
-            </div>
-          </div>
-          <div onClick={e => e.stopPropagation()}>
-            <OrderActionDropdown order={{ restaurant_id: order.restaurant_id, orderid: order.id }} />
-          </div>
-        </div>
-      </div>
+            {orders.data.map((order) => (
+              <div
+                key={order.id}
+                className="bg-white dark:bg-neutral-800 rounded-xl shadow-md border border-gray-100 dark:border-neutral-700 overflow-hidden hover:shadow-lg transition-shadow duration-200"
+              >
+                {/* Header Section */}
+                <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-neutral-700 dark:to-neutral-600 px-4 py-3 border-b border-gray-100 dark:border-neutral-600">
+                  <div className="flex justify-between items-center">
+                    <div className="flex-1 cursor-pointer">
+                      <div className="font-bold text-lg text-red-700 dark:text-red-400" onClick={() => { setSelectedOrder(order); setDialogOpen(true); }}>
+                        #{order.order_number}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-neutral-400 mt-1">
+                        {dayjs(order.created_at).format('DD MMM YYYY, hh:mm A')}
+                      </div>
+                    </div>
+                    <div onClick={e => e.stopPropagation()}>
+                      <OrderActionDropdown 
+                        order={{ restaurant_id: order.restaurant_id, orderid: order.id, ...order }}
+                        onAddItems={handleAddItems}
+                      />
+                    </div>
+                  </div>
+                </div>
 
-      {/* Content Section */}
-      <div 
-        className="p-4 cursor-pointer"
-        // onClick={() => { setSelectedOrder(order); setDialogOpen(true); }}
-      >
-        <div className="space-y-3">
-          {/* Customer Info */}
-          <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-              <span className="text-blue-600 dark:text-blue-300 text-xs font-semibold">
-                {order.customer.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <div className="flex-1">
-              <div className="font-semibold text-gray-900 dark:text-neutral-100">
-                {order.customer.name}
+                {/* Content Section */}
+                <div className="p-4 cursor-pointer">
+                  <div className="space-y-3">
+                    {/* Customer Info */}
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                        <span className="text-blue-600 dark:text-blue-300 text-xs font-semibold">
+                          {order.customer.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-gray-900 dark:text-neutral-100">
+                          {order.customer.name}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-neutral-400">
+                          {order.customer.phone}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Order Details Grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-gray-50 dark:bg-neutral-700 rounded-lg p-3">
+                        <div className="text-xs text-gray-500 dark:text-neutral-400 uppercase tracking-wide">
+                          Order Type
+                        </div>
+                        <div className="mt-1">
+                          <OrderStatus
+                            orderId={order.id}
+                            ordertype={order.order_type}
+                            dining_table_name={order.dining_table?.name}
+                            order_status={order.status}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-50 dark:bg-neutral-700 rounded-lg p-3">
+                        <div className="text-xs text-gray-500 dark:text-neutral-400 uppercase tracking-wide">
+                          Payment
+                        </div>
+                        <div className="mt-1">
+                          <PaymentStatus orderId={order.id} paymentStatus={order.payment_status} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Total Amount */}
+                    <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 border border-green-200 dark:border-green-800">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-green-800 dark:text-green-300">
+                          Total Amount
+                        </span>
+                        <span className="flex items-center font-bold text-lg text-green-700 dark:text-green-400">
+                          <IndianRupee className="w-4 h-4 mr-1" />
+                          {order.total}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="text-sm text-gray-500 dark:text-neutral-400">
-                {order.customer.phone}
+            ))}
+
+            {/* Pagination on mobile */}
+            {orders.total > orders.per_page && (
+              <div className="flex flex-wrap gap-2 mt-6 px-2">
+                {orders.links.map((link, index) => (
+                  <button
+                    key={index}
+                    disabled={!link.url}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
+                      ${link.active 
+                        ? 'bg-red-600 text-white shadow-md' 
+                        : 'bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 border border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700'
+                      }
+                      ${!link.url ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                    `}
+                    onClick={() => {
+                      if (link.url) {
+                        router.get(link.url, {}, { preserveState: true })
+                      }
+                    }}
+                    dangerouslySetInnerHTML={{ __html: link.label }}
+                  />
+                ))}
               </div>
-            </div>
+            )}
           </div>
-
-          {/* Order Details Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gray-50 dark:bg-neutral-700 rounded-lg p-3">
-              <div className="text-xs text-gray-500 dark:text-neutral-400 uppercase tracking-wide">
-                Order Type
-              </div>
-              <div className="mt-1">
-                <OrderStatus
-                  orderId={order.id}
-                  ordertype={order.order_type}
-                  dining_table_name={order.dining_table?.name}
-                  order_status={order.status}
-                />
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 dark:bg-neutral-700 rounded-lg p-3">
-              <div className="text-xs text-gray-500 dark:text-neutral-400 uppercase tracking-wide">
-                Payment
-              </div>
-              <div className="mt-1">
-                <PaymentStatus orderId={order.id} paymentStatus={order.payment_status} />
-              </div>
-            </div>
-          </div>
-
-          {/* Total Amount */}
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 border border-green-200 dark:border-green-800">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-green-800 dark:text-green-300">
-                Total Amount
-              </span>
-              <span className="flex items-center font-bold text-lg text-green-700 dark:text-green-400">
-                <IndianRupee className="w-4 h-4 mr-1" />
-                {order.total}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  ))}
-
-  {/* Pagination on mobile */}
-  {orders.total > orders.per_page && (
-    <div className="flex flex-wrap gap-2 mt-6 px-2">
-      {orders.links.map((link, index) => (
-        <button
-          key={index}
-          disabled={!link.url}
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
-            ${link.active 
-              ? 'bg-red-600 text-white shadow-md' 
-              : 'bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 border border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700'
-            }
-            ${!link.url ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-          `}
-          onClick={() => {
-            if (link.url) {
-              router.get(link.url, {}, { preserveState: true })
-            }
-          }}
-          dangerouslySetInnerHTML={{ __html: link.label }}
-        />
-      ))}
-    </div>
-  )}
-</div>
-
 
           {/* DESKTOP/TABLET TABLE */}
           <div className="hidden md:block relative min-h-[40vh] flex-1 rounded-xl">
@@ -234,7 +248,10 @@ const OrderMain = ({ orders, filters }) => {
                         {dayjs(order.created_at).format('DD MMM YYYY, hh:mm A')}
                       </td>
                       <td className="px-6 py-4 text-end text-sm font-medium">
-                        <OrderActionDropdown order={{ restaurant_id: order.restaurant_id, orderid: order.id }} />
+                        <OrderActionDropdown 
+                          order={{ restaurant_id: order.restaurant_id, orderid: order.id, ...order }}
+                          onAddItems={handleAddItems}
+                        />
                       </td>
                     </tr>
                   ))}

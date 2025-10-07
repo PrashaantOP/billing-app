@@ -68,6 +68,10 @@ class RegisteredUserController extends Controller
         Session::put('current_restaurant_id', $restaurant->id);
         Session::put('switched_restaurant', $restaurant);
 
+        // --- Store Role In Session Here ---
+        // $role = $restaurant->pivot->role ?? null;
+        Session::put('current_role', 'admin');
+
         return to_route('dashboard');
     }
 }

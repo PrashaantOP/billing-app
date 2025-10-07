@@ -77,6 +77,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/orders-view', [OrderController::class, 'viewOderPage'])->name('orders.view.search');
     Route::patch('/orders-type/{order}', [OrderController::class, 'updateOrderType'])->name('orders.type.update');
 
+    Route::get('/api/menu-items/{restaurantId}', [OrderController::class, 'getMenuItems']);
+    Route::put('/orders/{order}/update-items', [OrderController::class, 'updateOrderItems']);
+
     //order history
     Route::get('/order-history', [OrderHistoryController::class, 'viewOrderHistory'])->name('order.history');
 

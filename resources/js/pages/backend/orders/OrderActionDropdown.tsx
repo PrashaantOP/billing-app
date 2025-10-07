@@ -1,3 +1,4 @@
+// OrderActionDropdown.jsx (updated)
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,60 +15,59 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { IconDotsVertical } from "@tabler/icons-react"
-import { ArrowUpFromDot, Delete, Dot, Download, EllipsisVertical, ExternalLink, FileDown, Pencil, Trash } from "lucide-react"
-import { OrderStatus } from "./OrderStatus"
+import { FilePlus2, FileDown, Trash } from "lucide-react"
 
-type OrderProps = {
-    order: {
-        hotrestaurant_idelname: string;
-        order_id: string | number;
-    }
-  
-}
-
-
-export function OrderActionDropdown({order} : OrderProps) {
+export function OrderActionDropdown({ order, onAddItems }) {
   return (
     <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Edit order</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Payment status</DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem>Paid</DropdownMenuItem>
-                      <DropdownMenuItem>Not Paid</DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-                <DropdownMenuItem>
-                  Order status
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          
-          <DropdownMenuItem>Invoice
-            <DropdownMenuShortcut>
-                <FileDown />
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive"><Trash /> Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+          size="icon"
+        >
+          <IconDotsVertical />
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-32">
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Edit order</DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Payment status</DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem>Paid</DropdownMenuItem>
+                    <DropdownMenuItem>Not Paid</DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+              <DropdownMenuItem>Order status</DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+        
+        <DropdownMenuItem onClick={() => onAddItems(order)}>
+          Add items
+          <DropdownMenuShortcut>
+            <FilePlus2 />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem>
+          Invoice
+          <DropdownMenuShortcut>
+            <FileDown />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive">
+          <Trash /> Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

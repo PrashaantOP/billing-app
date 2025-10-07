@@ -29,9 +29,7 @@ type Props = PageProps & {
   tables: DiningTable[];
 };
 
-export default function MainDiningTable({ tables }: Props) {
-  const restaurantName = tables[0]?.restaurant.name || 'Restaurant';
-  const restaurantId = tables[0]?.restaurant_id || 1;
+export default function MainDiningTable({ tables, restaurantId, restaurantName }: Props) {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>

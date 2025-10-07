@@ -66,9 +66,9 @@ export function ChartAreaInteractive({ chartData = [], chartConfig }) {
             <ToggleGroupItem value="30d">Last 30 days</ToggleGroupItem>
             <ToggleGroupItem value="7d">Last 7 days</ToggleGroupItem>
           </ToggleGroup>
-          <Select value={timeRange} onValueChange={setTimeRange}>
+          <Select value={timeRange} onValueChange={setTimeRange} >
             <SelectTrigger
-              className="flex w-40"
+              className="flex w-40 @[767px]/card:hidden"
               size="sm"
               aria-label="Select a value"
             >

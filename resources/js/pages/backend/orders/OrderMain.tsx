@@ -45,7 +45,7 @@ const OrderMain = ({ orders, filters }) => {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Our orders" />
       <OrderDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} order={selectedOrder} />
-      
+
       {/* Add Items Modal */}
       <AddItemsModal
         open={addItemsModalOpen}
@@ -93,7 +93,7 @@ const OrderMain = ({ orders, filters }) => {
                       </div>
                     </div>
                     <div onClick={e => e.stopPropagation()}>
-                      <OrderActionDropdown 
+                      <OrderActionDropdown
                         order={{ restaurant_id: order.restaurant_id, orderid: order.id, ...order }}
                         onAddItems={handleAddItems}
                       />
@@ -136,7 +136,7 @@ const OrderMain = ({ orders, filters }) => {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="bg-gray-50 dark:bg-neutral-700 rounded-lg p-3">
                         <div className="text-xs text-gray-500 dark:text-neutral-400 uppercase tracking-wide">
                           Payment
@@ -172,8 +172,8 @@ const OrderMain = ({ orders, filters }) => {
                     key={index}
                     disabled={!link.url}
                     className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
-                      ${link.active 
-                        ? 'bg-red-600 text-white shadow-md' 
+                      ${link.active
+                        ? 'bg-red-600 text-white shadow-md'
                         : 'bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-300 border border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700'
                       }
                       ${!link.url ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
@@ -248,7 +248,7 @@ const OrderMain = ({ orders, filters }) => {
                         {dayjs(order.created_at).format('DD MMM YYYY, hh:mm A')}
                       </td>
                       <td className="px-6 py-4 text-end text-sm font-medium">
-                        <OrderActionDropdown 
+                        <OrderActionDropdown
                           order={{ restaurant_id: order.restaurant_id, orderid: order.id, ...order }}
                           onAddItems={handleAddItems}
                         />

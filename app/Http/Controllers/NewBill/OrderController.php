@@ -162,13 +162,35 @@ class OrderController extends Controller
 
     public function getMenuItems($restaurantId)
     {
-        $menuItems = MenuItem::where('restaurant_id', $restaurantId)
+        $menuItems = \App\Models\MenuItem::with('category')
+            ->where('restaurant_id', $restaurantId)
             ->where('is_available', true)
-            ->select('id', 'name', 'price', 'is_available')
+            ->select('id', 'name', 'price', 'image', 'is_available', 'category_id')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'price' => $item->price,
+                    'image' => $item->image,
+                    'is_available' => $item->is_available,
+                    'category_id' => $item->category_id,
+                    'category_name' => $item->category?->name ?? '',
+                ];
+            });
+
+        $categories = \App\Models\Category::where('restaurant_id', $restaurantId)
+            ->whereIn('id', $menuItems->pluck('category_id')->unique()->filter())
+            ->select('id', 'name')
+            ->orderBy('name')
             ->get();
 
-        return response()->json($menuItems);
+        return response()->json([
+            'menuItems' => $menuItems,
+            'categories' => $categories,
+        ]);
     }
+
 
 
 

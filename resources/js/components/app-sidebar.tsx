@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import { CompItem, type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { AudioWaveform, BookOpen,  Command,  CopyPlus, DollarSign, FilePlus, Folder, GalleryVerticalEnd, Gem, History, LayoutGrid, PackageCheck, Percent, ReceiptText, RefreshCcw, RefreshCw, SquarePlus, Store, Table, Users } from 'lucide-react';
+import { AudioWaveform, BookOpen,  Command,  CopyPlus, DollarSign, FileChartColumn, FilePlus, Folder, GalleryVerticalEnd, Gem, History, IndianRupee, LayoutGrid, PackageCheck, Percent, ReceiptText, RefreshCcw, RefreshCw, SquarePlus, Store, Table, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import { TeamSwitcher } from './team-switcher';
 
@@ -52,7 +52,12 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Payments',
         href: '/payments',
-        icon: DollarSign,
+        icon: IndianRupee,
+    },
+    {
+        title: 'Invoices',
+        href: '/invoices',
+        icon: FileChartColumn,
     },
     // {
     //     title: 'Taxes',

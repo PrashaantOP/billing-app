@@ -242,7 +242,7 @@ return new class extends Migration
             $table->unsignedBigInteger('order_id');
             $table->date('payment_date');
             $table->decimal('amount_paid', 10, 2);
-            $table->string('payment_method')->default('Cash');
+            $table->enum('payment_method', ['cash', 'bank', 'upi', 'card', 'cheque'])->default('cash');
             $table->string('transaction_reference')->nullable();
             $table->enum('status', ['paid', 'partial']);
             $table->text('notes')->nullable();

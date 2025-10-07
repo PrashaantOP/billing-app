@@ -110,7 +110,7 @@ class OrderController extends Controller
             if (!empty($data['payment']) && $data['payment']['isPaid']) {
                 $order->payments()->create([
                     'restaurant_id' => $restaurantId,
-                    'payment_method' => $data['payment']['method'],
+                    'payment_method' => $data['payment']['method'] ?? 'Cash',
                     'transaction_reference' => $data['payment']['transactionId'],
                     'transaction_id' => $data['payment']['transactionId'] ?? null,
                     'amount_paid' => $data['total'],

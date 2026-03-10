@@ -257,4 +257,77 @@ class OrderController extends Controller
         //     'payment_status' => $order->payment_status
         // ]);
     }
+
+    public function updateOrderItems(Request $request, Order $order)
+    {
+        $data = $request->validate([
+            'items' => 'required|array|min:1',
+            'items.*.menu_item_id' => 'required|exists:menu_items,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric|min:0',
+            'items.*.total_price' => 'required|numeric|min:0',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $restaurantId = session('current_restaurant_id') ?? $order->restaurant_id;
+
+            // Delete existing order items
+            $order->items()->delete();
+
+            // Insert new items
+            $subtotal = 0;
+            foreach ($data['items'] as $item) {
+                $order->items()->create([
+                    'menu_item_id' => $item['menu_item_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'total_price' => $item['total_price'],
+                ]);
+                $subtotal += $item['total_price'];
+            }
+
+            // Recalculate Tax
+            // Clear existing taxes
+            $order->taxes()->delete();
+
+            $activeTaxes = \App\Models\Tax::where('restaurant_id', $restaurantId)->where('is_inclusive', 1)->get();
+            $discountedSubtotal = $subtotal - ($order->discount ?? 0);
+            
+            $totalTax = 0;
+            foreach ($activeTaxes as $tax) {
+                $rate = (float)$tax->rate;
+                $amount = $tax->rate_type === 'percent'
+                    ? ($discountedSubtotal * $rate / 100)
+                    : $rate;
+
+                $order->taxes()->create([
+                    'restaurant_id' => $restaurantId,
+                    'tax_id' => $tax->id,
+                    'rate' => $rate,
+                    'rate_type' => $tax->rate_type,
+                    'amount' => $amount,
+                ]);
+                $totalTax += $amount;
+            }
+
+            // Update Order totals
+            $total = $subtotal + $totalTax - ($order->discount ?? 0);
+            
+            $order->update([
+                'subtotal' => $subtotal,
+                'tax' => $totalTax,
+                'total' => $total,
+                'due_amount' => max(0, $total - $order->amount_paid),
+            ]);
+
+            DB::commit();
+
+            return back()->with('success', 'Order items updated successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to update order items: ' . $e->getMessage()]);
+        }
+    }
 }

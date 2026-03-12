@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Restaurant;
+use App\Models\RestaurantPrintSetting;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -10,6 +12,70 @@ use Illuminate\Support\Facades\Session;
 
 class HandleInertiaRequests extends Middleware
 {
+    private function resolvePrintSettings(): array
+    {
+        $restaurantId = session('current_restaurant_id');
+        if (!$restaurantId) {
+            return [
+                'print_type'         => 'bill_only',
+                'paper_size'         => '80mm',
+                'header_text'        => '',
+                'footer_text'        => 'Thank you for visiting!',
+                'show_logo'          => true,
+                'show_tax_details'   => true,
+                'show_customer_info' => true,
+                'show_order_type'    => true,
+                'font_size'          => 'medium',
+            ];
+        }
+
+        $settings = RestaurantPrintSetting::firstOrCreate(
+            ['restaurant_id' => $restaurantId],
+            [
+                'print_type'         => 'bill_only',
+                'paper_size'         => '80mm',
+                'header_text'        => '',
+                'footer_text'        => 'Thank you for visiting!',
+                'show_logo'          => true,
+                'show_tax_details'   => true,
+                'show_customer_info' => true,
+                'show_order_type'    => true,
+                'font_size'          => 'medium',
+            ]
+        );
+
+        return $settings->toArray();
+    }
+
+    private function resolveCurrentRestaurant(): ?array
+    {
+        $restaurantId = session('current_restaurant_id');
+        if (!$restaurantId) return null;
+        $r = Restaurant::find($restaurantId);
+        return $r ? $r->only(['id', 'name', 'logo', 'email', 'phone', 'address', 'gst_no']) : null;
+    }
+
+    private function resolveSubscription(Request $request): array
+    {
+        $user = $request->user();
+        if (!$user) {
+            return ['plan_name' => 'Free Plan', 'status' => 'free', 'is_pro' => false];
+        }
+
+        $sub = $user->currentSubscription?->load('plan');
+
+        if ($sub && $sub->plan && in_array($sub->status, ['active', 'trialing'])) {
+            return [
+                'plan_name' => $sub->plan->name,
+                'status'    => $sub->status,
+                'is_pro'    => true,
+            ];
+        }
+
+        return ['plan_name' => 'Free Plan', 'status' => 'free', 'is_pro' => false];
+    }
+
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -50,6 +116,9 @@ class HandleInertiaRequests extends Middleware
                 'current_restaurant_id' => Session::get('current_restaurant_id'),
             ],
             'current_role' => fn() => Session::get('current_role'),
+            'subscription'      => fn() => $this->resolveSubscription($request),
+            'printSettings'     => fn() => $this->resolvePrintSettings(),
+            'currentRestaurant' => fn() => $this->resolveCurrentRestaurant(),
             'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

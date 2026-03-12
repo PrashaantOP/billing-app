@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Gate;
 
 class PaymentController extends Controller
 {
@@ -21,5 +22,19 @@ class PaymentController extends Controller
         return Inertia::render('backend/payments/PaymentList', [
             'payments' => $payments
         ]);
+    }
+
+    public function updateNotes(Request $request, Payment $payment)
+    {
+        $request->validate(['notes' => 'nullable|string|max:1000']);
+
+        $restaurantId = session('current_restaurant_id');
+        if ($payment->restaurant_id !== $restaurantId) {
+            abort(403);
+        }
+
+        $payment->update(['notes' => $request->notes]);
+
+        return back()->with('success', 'Notes updated successfully.');
     }
 }

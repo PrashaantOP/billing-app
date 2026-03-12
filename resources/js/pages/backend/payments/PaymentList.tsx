@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import { Pencil } from 'lucide-react';
 import OrderDetailsDialog from './OrderDetailsModal';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Payments', href: '/payments' },
@@ -16,7 +20,7 @@ type Payment = {
   status: 'paid' | 'pending' | 'failed' | string;
   notes?: string | null;
   created_at: string;
-  order?: { order_number: string; /* include other props if used in modal */ };
+  order?: { order_number: string };
 };
 
 type Props = {
@@ -31,6 +35,31 @@ type Props = {
 export default function PaymentList({ payments }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Payment['order'] | null>(null);
+
+  // Notes edit state
+  const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
+  const [editNotes, setEditNotes] = useState('');
+  const [editNotesOpen, setEditNotesOpen] = useState(false);
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
+
+  const openEditNotes = (p: Payment) => {
+    setEditingPayment(p);
+    setEditNotes(p.notes || '');
+    setEditNotesOpen(true);
+  };
+
+  const handleSaveNotes = () => {
+    if (!editingPayment) return;
+    setIsSavingNotes(true);
+    router.put(`/payments/${editingPayment.id}/update-notes`, { notes: editNotes }, {
+      onSuccess: () => {
+        setEditNotesOpen(false);
+        setEditingPayment(null);
+        setIsSavingNotes(false);
+      },
+      onError: () => setIsSavingNotes(false),
+    });
+  };
 
   const hasItems = (payments?.data?.length ?? 0) > 0;
 
@@ -49,6 +78,36 @@ export default function PaymentList({ payments }: Props) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Payments" />
       <OrderDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} order={selectedOrder} />
+
+      {/* Edit Notes Dialog */}
+      <Dialog open={editNotesOpen} onOpenChange={setEditNotesOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Payment Notes</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <Textarea
+              value={editNotes}
+              onChange={e => setEditNotes(e.target.value)}
+              placeholder="Add notes about this payment..."
+              rows={4}
+              className="resize-none"
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditNotesOpen(false)} disabled={isSavingNotes}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveNotes}
+                disabled={isSavingNotes}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {isSavingNotes ? 'Saving...' : 'Save Notes'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="w-full px-3 pt-4 sm:px-6 lg:px-4">
         {/* Header */}
@@ -127,11 +186,18 @@ export default function PaymentList({ payments }: Props) {
                   </div>
                 </div>
 
-                {p.notes && (
-                  <div className="mt-3 rounded-lg bg-gray-50 p-3 text-sm text-gray-600 dark:bg-neutral-800 dark:text-neutral-300">
-                    {p.notes}
-                  </div>
-                )}
+                <div className="mt-3 flex items-start justify-between gap-2 rounded-lg bg-gray-50 p-3 dark:bg-neutral-800">
+                  <p className="flex-1 text-sm text-gray-600 dark:text-neutral-300">
+                    {p.notes || <span className="italic text-gray-400">No notes</span>}
+                  </p>
+                  <button
+                    onClick={() => openEditNotes(p)}
+                    title="Edit notes"
+                    className="shrink-0 rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -141,7 +207,7 @@ export default function PaymentList({ payments }: Props) {
         {hasItems && (
           <div className="hidden md:block">
             <div className="w-full overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow dark:border-neutral-800 dark:bg-neutral-900">
-              <table className="w-full min-w-[700px] table-auto text-[15px]">
+              <table className="w-full min-w-175 table-auto text-[15px]">
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-100 dark:border-neutral-800 dark:bg-neutral-800">
                     <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-neutral-400">
@@ -171,7 +237,7 @@ export default function PaymentList({ payments }: Props) {
                       className="border-b border-gray-100 transition hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-800"
                     >
                       <td
-                        className="px-5 py-4 font-bold text-gray-700 underline hover:text-red-700 dark:text-neutral-200 dark:hover:text-red-400 cursor-pointer"
+                        className="cursor-pointer px-5 py-4 font-bold text-gray-700 underline hover:text-red-700 dark:text-neutral-200 dark:hover:text-red-400"
                         onClick={() => {
                           if (p.order) {
                             setSelectedOrder(p.order);
@@ -197,8 +263,19 @@ export default function PaymentList({ payments }: Props) {
                           minute: '2-digit',
                         })}
                       </td>
-                      <td className="hidden px-5 py-4 text-gray-700 dark:text-neutral-300 md:table-cell">
-                        {p.notes || <span className="italic text-gray-400">---</span>}
+                      <td className="hidden px-5 py-4 md:table-cell">
+                        <div className="flex items-center gap-2">
+                          <span className="flex-1 text-sm text-gray-700 dark:text-neutral-300">
+                            {p.notes || <span className="italic text-gray-400">---</span>}
+                          </span>
+                          <button
+                            onClick={() => openEditNotes(p)}
+                            title="Edit notes"
+                            className="shrink-0 rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 transition-colors"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

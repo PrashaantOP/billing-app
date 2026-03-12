@@ -2,7 +2,6 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import AddNewCategory from '@/pages/backend/categories/addCategory';
 import { Input } from '@headlessui/react';
 // import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
@@ -68,8 +67,22 @@ export default function NewBillLayout({ children, categories }: NewBillLayoutPro
                 />
             </div>
 
-            {/* Filtered Categories */}
+            {/* Category nav */}
             <nav className="flex flex-row lg:flex-col space-y-1 space-x-0 overflow-x-auto lg:overflow-x-hidden">
+                {/* All Items button */}
+                <Button
+                    size="sm"
+                    variant="ghost"
+                    asChild
+                    className={cn('w-full justify-start font-medium', {
+                        'bg-muted': currentPath.endsWith('/all'),
+                    })}
+                >
+                    <Link href="/newbill/menu/all" prefetch>
+                        All Items
+                    </Link>
+                </Button>
+
                 {categories
                 .filter((item) =>
                     item.name.toLowerCase().includes(searchTerm.toLowerCase())

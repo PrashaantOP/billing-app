@@ -12,6 +12,7 @@ const sidebarNavItems: NavItem[] = [
   { title: 'Taxes', href: '/settings/taxes', icon: null },
   { title: 'Staff', href: '/staff', icon: null },
   { title: 'Password', href: '/settings/password', icon: null },
+  { title: 'Print Settings', href: '/settings/print', icon: null },
   { title: 'Appearance', href: '/settings/appearance', icon: null },
 ];
 

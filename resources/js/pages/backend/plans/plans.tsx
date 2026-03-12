@@ -1,124 +1,165 @@
-import AppLayout from '@/layouts/app-layout'
-import { CheckIcon } from '@heroicons/react/20/solid'
-import { usePage } from '@inertiajs/react'
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
+import { Check, Gem, Zap } from 'lucide-react';
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Plans', href: '/plans' }];
+
+type Plan = {
+    id: number;
+    name: string;
+    description: string;
+    monthly_price: number;
+    yearly_price: number;
+    max_restaurants: number;
+    max_users_per_restaurant: number;
+    max_menu_items: number | null;
+    max_orders_per_month: number;
+    is_active: boolean;
+};
+
+type Subscription = { plan_name: string; status: string; is_pro: boolean };
+
+function formatPrice(amount: number) {
+    return `₹${Number(amount).toLocaleString('en-IN')}`;
 }
 
-export default function plans() {
-  const { plans } = usePage().props
+export default function PlansPage() {
+    const { plans, subscription } = usePage<{ plans: Plan[]; subscription: Subscription }>().props;
+    const currentPlan = subscription?.plan_name ?? 'Free Plan';
+    const isPro = subscription?.is_pro ?? false;
 
-  // Create tiers array from database plans
-  const tiers = plans.map((plan, index) => ({
-    name: plan.name,
-    id: `tier-${plan.id}`,
-    href: '#',
-    priceMonthly: plan.monthly_price > 0 ? `₹${plan.monthly_price}` : `₹${plan.yearly_price}`,
-    description: plan.description,
-    features: [
-      `${plan.max_restaurants} restaurant${plan.max_restaurants > 1 ? 's' : ''}`,
-      `Up to ${plan.max_users_per_restaurant} users per restaurant`,
-      `${plan.max_menu_items || 'Unlimited'} menu items`,
-      `${plan.max_orders_per_month} orders per month`,
-      'Customer management',
-      'Order management',
-      'Menu management',
-      'Basic reports',
-      'Basic support'
-    ],
-    featured: index === 1, // Second plan will be featured
-  }))
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Plans & Pricing" />
 
-  return (
-    <AppLayout>
-    <div className="relative isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
-      <div aria-hidden="true" className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl">
-        <div
-          style={{
-            clipPath:
-              'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-          }}
-          className="mx-auto aspect-[1155/678] w-[72.1875rem] bg-gradient-to-tr from-[#ff6b6b] to-[#f06595] opacity-30"
-        />
-      </div>
-      <div className="mx-auto max-w-4xl text-center">
-        <h2 className="text-base/7 font-semibold text-red-600">Pricing</h2>
-        <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-6xl">
-          Choose the right plan for you
-        </p>
-      </div>
-      <p className="mx-auto mt-6 max-w-2xl text-center text-lg font-medium text-pretty text-gray-600 sm:text-xl/8">
-        Choose an affordable plan that's packed with the best features for managing your restaurant, engaging customers, and driving sales.
-      </p>
-      <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
-        {tiers.map((tier, tierIdx) => (
-          <div
-            key={tier.id}
-            className={classNames(
-              tier.featured ? 'relative bg-gray-900 shadow-2xl' : 'bg-white/60 sm:mx-8 lg:mx-0',
-              tier.featured
-                ? ''
-                : tierIdx === 0
-                  ? 'rounded-t-3xl sm:rounded-b-none lg:rounded-tr-none lg:rounded-bl-3xl'
-                  : 'sm:rounded-t-none lg:rounded-tr-3xl lg:rounded-bl-none',
-              'rounded-3xl p-8 ring-1 ring-gray-900/10 sm:p-10',
-            )}
-          >
-            <h3
-              id={tier.id}
-              className={classNames(tier.featured ? 'text-red-400 text-base/7 font-semibold' : 'text-red-600 text-sm/7 font-semibold')}
-            >
-              {tier.name}
-            </h3>
-            <p className="mt-4 flex items-baseline gap-x-2">
-              <span
-                className={classNames(
-                  tier.featured ? 'text-white text-5xl font-semibold tracking-tight' : 'text-gray-900 text-3xl font-semibold tracking-tight'
+            <div className="mx-auto max-w-5xl px-4 py-10">
+                {/* Header */}
+                <div className="mb-10 text-center">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-sm font-semibold text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                        <Gem className="h-3.5 w-3.5" /> Pricing
+                    </span>
+                    <h1 className="mt-4 text-4xl font-bold tracking-tight text-gray-900 dark:text-neutral-50 sm:text-5xl">
+                        Choose the right plan
+                    </h1>
+                    <p className="mt-4 text-lg text-gray-500 dark:text-neutral-400">
+                        Packed with everything you need to run your restaurant efficiently.
+                    </p>
+                    <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
+                        <span className={`h-2 w-2 rounded-full ${isPro ? 'bg-green-500' : 'bg-gray-400'}`} />
+                        <span className="text-gray-600 dark:text-neutral-400">
+                            Current plan: <strong className="text-gray-900 dark:text-neutral-100">{currentPlan}</strong>
+                        </span>
+                    </div>
+                </div>
+
+                {/* Plan cards */}
+                <div className={`grid gap-6 ${plans.length <= 1 ? 'max-w-sm mx-auto' : plans.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3'}`}>
+                    {plans.map((plan, idx) => {
+                        const isCurrent = plan.name === currentPlan;
+                        const isFeatured = plans.length > 1 && idx === Math.floor(plans.length / 2);
+                        const price = plan.monthly_price > 0 ? plan.monthly_price : plan.yearly_price;
+                        const cycle = plan.monthly_price > 0 ? 'month' : 'year';
+
+                        const features = [
+                            `${plan.max_restaurants} restaurant${plan.max_restaurants !== 1 ? 's' : ''}`,
+                            `Up to ${plan.max_users_per_restaurant} staff per restaurant`,
+                            plan.max_menu_items ? `${plan.max_menu_items} menu items` : 'Unlimited menu items',
+                            `${plan.max_orders_per_month.toLocaleString('en-IN')} orders/month`,
+                            'Customer management',
+                            'Order & payment tracking',
+                            'KOT & invoice printing',
+                            'GST reports & Excel export',
+                        ];
+
+                        return (
+                            <div
+                                key={plan.id}
+                                className={[
+                                    'relative flex flex-col rounded-2xl border p-8 transition-shadow',
+                                    isFeatured
+                                        ? 'border-red-500 bg-gray-900 shadow-2xl shadow-red-500/20 dark:bg-neutral-900'
+                                        : 'border-gray-200 bg-white shadow-sm hover:shadow-md dark:border-neutral-700 dark:bg-neutral-900',
+                                ].join(' ')}
+                            >
+                                {isFeatured && (
+                                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-red-600 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white shadow">
+                                        Most Popular
+                                    </span>
+                                )}
+                                {isCurrent && (
+                                    <span className="absolute right-4 top-4 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-900/40 dark:text-green-400">
+                                        Active
+                                    </span>
+                                )}
+
+                                <div className="mb-6">
+                                    <h2 className={`text-lg font-bold ${isFeatured ? 'text-red-400' : 'text-red-600 dark:text-red-400'}`}>
+                                        {plan.name}
+                                    </h2>
+                                    <div className="mt-3 flex items-baseline gap-1">
+                                        <span className={`text-4xl font-bold tracking-tight ${isFeatured ? 'text-white' : 'text-gray-900 dark:text-neutral-50'}`}>
+                                            {formatPrice(price)}
+                                        </span>
+                                        <span className={`text-sm ${isFeatured ? 'text-gray-400' : 'text-gray-500'}`}>/{cycle}</span>
+                                    </div>
+                                    {plan.description && (
+                                        <p className={`mt-2 text-sm ${isFeatured ? 'text-gray-400' : 'text-gray-500 dark:text-neutral-400'}`}>
+                                            {plan.description}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <ul className="mb-8 flex-1 space-y-3">
+                                    {features.map(f => (
+                                        <li key={f} className="flex items-start gap-2.5 text-sm">
+                                            <Check className={`mt-0.5 h-4 w-4 shrink-0 ${isFeatured ? 'text-red-400' : 'text-red-600 dark:text-red-400'}`} />
+                                            <span className={isFeatured ? 'text-gray-300' : 'text-gray-600 dark:text-neutral-300'}>{f}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <button
+                                    disabled={isCurrent}
+                                    className={[
+                                        'flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all focus:outline-none',
+                                        isCurrent
+                                            ? 'cursor-default bg-gray-100 text-gray-400 dark:bg-neutral-800 dark:text-neutral-500'
+                                            : isFeatured
+                                            ? 'bg-red-600 text-white hover:bg-red-500 shadow-lg shadow-red-500/30'
+                                            : 'border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20',
+                                    ].join(' ')}
+                                >
+                                    {isCurrent ? 'Active Plan' : <><Zap className="h-4 w-4" /> Upgrade to {plan.name}</>}
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Free plan notice if already on free */}
+                {!isPro && (
+                    <div className="mt-8 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center dark:border-amber-800 dark:bg-amber-900/20">
+                        <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                            You are on the <strong>Free Plan</strong>. Upgrade to unlock more restaurants, staff, and order capacity.
+                        </p>
+                    </div>
                 )}
-              >
-                {tier.priceMonthly}
-              </span>
-              <span className={classNames(tier.featured ? 'text-gray-400' : 'text-gray-500', 'text-base')}>
-                {tier.priceMonthly.includes('9990') ? '/year' : '/month'}
-              </span>
-            </p>
-            <p className={classNames(tier.featured ? 'text-gray-300 mt-6 text-base/7' : 'text-gray-600 text-xs/6 mt-2')}>
-              {tier.description}
-            </p>
-            <ul
-              role="list"
-              className={classNames(
-                tier.featured ? 'text-gray-300' : 'text-gray-600',
-                'mt-8 space-y-3 text-sm/6 sm:mt-10',
-              )}
-            >
-              {tier.features.map((feature) => (
-                <li key={feature} className="flex gap-x-3">
-                  <CheckIcon
-                    aria-hidden="true"
-                    className={classNames(tier.featured ? 'text-red-400' : 'text-red-600', 'h-6 w-5 flex-none')}
-                  />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-            <a
-              href={tier.href}
-              aria-describedby={tier.id}
-              className={classNames(
-                tier.featured
-                  ? 'bg-red-500 text-white shadow-xs hover:bg-red-400 focus-visible:outline-red-500'
-                  : 'text-red-600 ring-1 ring-red-200 ring-inset hover:ring-red-300 focus-visible:outline-red-600',
-                'mt-8 block rounded-md px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
-              )}
-            >
-              Get started today
-            </a>
-          </div>
-        ))}
-      </div>
-    </div>
-    </AppLayout>
-  )
+
+                {/* Contact CTA */}
+                <div className="mt-10 rounded-2xl border border-gray-200 bg-gray-50 p-8 text-center dark:border-neutral-700 dark:bg-neutral-800/50">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-neutral-100">Need a custom plan?</h3>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-neutral-400">
+                        Running multiple brands or a large chain? Get in touch for an enterprise quote.
+                    </p>
+                    <a
+                        href="mailto:support@example.com"
+                        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
+                    >
+                        Contact Sales
+                    </a>
+                </div>
+            </div>
+        </AppLayout>
+    );
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Settings\PasswordController;
+use App\Http\Controllers\Settings\PrintSettingController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\StaffController;
 use App\Http\Controllers\Settings\StoreController;
@@ -33,6 +34,9 @@ Route::middleware('auth')->group(function () {
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
 
     Route::resource('staff', StaffController::class)->middleware(AdminOrManagerOnly::class)->only(['index', 'store', 'update', 'destroy']);
+
+    Route::get('settings/print', [PrintSettingController::class, 'edit'])->name('print.settings.edit');
+    Route::put('settings/print', [PrintSettingController::class, 'update'])->name('print.settings.update');
 
     Route::get('settings/appearance', function () {
         return Inertia::render('settings/appearance');

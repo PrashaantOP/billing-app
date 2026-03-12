@@ -37,6 +37,27 @@ class CreateNewBillController extends Controller
     //     ]);
     // }
 
+    public function getAllItems()
+    {
+        $restaurant_id = session('current_restaurant_id');
+        $categories = Category::where('restaurant_id', $restaurant_id)->get();
+
+        if ($categories->isEmpty()) {
+            return redirect()->route('menu.item.view');
+        }
+
+        $taxes = Tax::where('restaurant_id', $restaurant_id)->where('is_inclusive', 1)->get();
+        $menuItems = MenuItem::where('restaurant_id', $restaurant_id)->get();
+
+        return Inertia::render('backend/newbill/createNewBill', [
+            'categories'    => $categories,
+            'menuitems'     => $menuItems,
+            'allmenuitems'  => $menuItems,
+            'taxes'         => $taxes,
+            'categoryname'  => 'All Items',
+        ]);
+    }
+
     public function getItemUsingSlug($slug)
     {
         $restaurant_id = session('current_restaurant_id');
@@ -57,16 +78,15 @@ class CreateNewBillController extends Controller
             return redirect()->route('menu.item.view');
         }
 
-        $menuItems = MenuItem::where('category_id', $singleCategory->id)->where('restaurant_id', $restaurant_id)
-            // ->with(['restaurant', 'category'])
-            ->get();
+        $menuItems = MenuItem::where('category_id', $singleCategory->id)->where('restaurant_id', $restaurant_id)->get();
+        $allMenuItems = MenuItem::where('restaurant_id', $restaurant_id)->get();
 
         return Inertia::render('backend/newbill/createNewBill', [
-            'categories' => $categories,
-            'menuitems' => $menuItems,
-            'taxes' => $taxes,
+            'categories'   => $categories,
+            'menuitems'    => $menuItems,
+            'allmenuitems' => $allMenuItems,
+            'taxes'        => $taxes,
             'categoryname' => $singleCategory->name,
-            'taxes' => $taxes,
         ]);
     }
 }

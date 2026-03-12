@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
     });
     // Route::redirect('newbill/menu', 'newbill/menu/{$singleCategory->slug}');
     // Route::get('newbill/menu', [CreateNewBillController::class, 'newBillShow'])->name('newbill.create-new-bill');
+    Route::get('newbill/menu/all', [CreateNewBillController::class, 'getAllItems'])->name('newbill.items.all');
     Route::get('newbill/menu/{category}', [CreateNewBillController::class, 'getItemUsingSlug'])->name('newbill.items.show');
 
     // Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');

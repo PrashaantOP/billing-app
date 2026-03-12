@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NewBill\OrderController;
 use App\Http\Controllers\NewBill\OrderHistoryController;
 use App\Http\Controllers\NewBill\PaymentController;
+use App\Http\Controllers\NewBill\InvoiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\Settings\RestaurantSwitchController;
@@ -85,9 +86,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //payments
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::put('/payments/{payment}/update-notes', [PaymentController::class, 'updateNotes'])->name('payments.update-notes');
+
     // Payment status update route for order
     Route::put('/orders/{order}/update-payment-status', [OrderController::class, 'updatePaymentStatus'])
         ->name('orders.update-payment-status');
+
+    // Invoices
+    Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/order-data', [InvoiceController::class, 'getOrderData'])->name('invoices.order-data');
 });
 
 require __DIR__ . '/settings.php';

@@ -1,35 +1,36 @@
-import React, { useEffect, useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
+import { useEffect, useState } from 'react'
+import { Dialog, DialogContent, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Plus, Minus, X, Search, ShoppingCart, IndianRupee } from 'lucide-react'
+import { IndianRupee, Minus, Plus, Search, ShoppingCart, X } from 'lucide-react'
 import { router } from '@inertiajs/react'
 
-const TAX_RATE = 12 // Set your percentage here or receive from backend, though backend recalculates.
+const TAX_RATE = 12
 
-const AddItemsModal = ({ open, onOpenChange, order }) => {
-  const [menuItems, setMenuItems] = useState([])
-  const [categories, setCategories] = useState([])
+const AddItemsModal = ({ open, onOpenChange, order }: any) => {
+  const [menuItems, setMenuItems]               = useState<any[]>([])
+  const [categories, setCategories]             = useState<any[]>([])
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [selectedItems, setSelectedItems] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+  const [selectedItems, setSelectedItems]       = useState<any[]>([])
+  const [searchTerm, setSearchTerm]             = useState('')
+  const [loading, setLoading]                   = useState(false)
+  const [isSaving, setIsSaving]                 = useState(false)
 
   useEffect(() => {
     if (open && order) {
-      const existingItems = order.items?.map(item => ({
-        id: item.menu_item_id,
-        name: item.menu_item.name,
-        price: Number(item.price),
-        image: item.menu_item.image,
-        quantity: item.quantity,
+      const existingItems = (order.items || []).map((item: any) => ({
+        id:          item.menu_item_id,
+        name:        item.menu_item.name,
+        price:       Number(item.price),
+        image:       item.menu_item.image,
+        quantity:    item.quantity,
         category_id: item.menu_item.category_id,
-      })) || []
+      }))
       setSelectedItems(existingItems)
+      setSearchTerm('')
+      setSelectedCategory('all')
       fetchMenuItems()
     }
   }, [open, order])
@@ -37,287 +38,273 @@ const AddItemsModal = ({ open, onOpenChange, order }) => {
   const fetchMenuItems = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/menu-items/${order.restaurant_id}`)
-      const data = await response.json()
+      const res  = await fetch(`/api/menu-items/${order.restaurant_id}`)
+      const data = await res.json()
       setMenuItems(data.menuItems || data)
       setCategories(data.categories || [])
-    } catch (e) { 
-      console.error(e) 
-    } finally { 
-      setLoading(false) 
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
     }
   }
 
-  // Filter
-  const filteredMenuItems = menuItems.filter(item => {
-    const search = item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    const cat = selectedCategory === 'all' || `${item.category_id}` === `${selectedCategory}`
-    return search && cat && item.is_available
+  const filteredItems = menuItems.filter(item => {
+    const matchSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchCat    = selectedCategory === 'all' || `${item.category_id}` === `${selectedCategory}`
+    return matchSearch && matchCat && item.is_available
   })
 
-  // Item actions
-  const addItem = (item) => {
-    const exists = selectedItems.find(i => i.id === item.id)
-    if (exists) {
-      setSelectedItems(selectedItems.map(i =>
-        i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-      ))
-    } else {
-      setSelectedItems([
-        ...selectedItems,
-        { id: item.id, name: item.name, price: Number(item.price), image: item.image, category_id: item.category_id, quantity: 1 }
-      ])
-    }
+  const getQty = (id: number) => selectedItems.find(i => i.id === id)?.quantity || 0
+
+  const addItem = (item: any) => {
+    setSelectedItems(prev => {
+      const exists = prev.find(i => i.id === item.id)
+      if (exists) return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i)
+      return [...prev, { id: item.id, name: item.name, price: Number(item.price), image: item.image, category_id: item.category_id, quantity: 1 }]
+    })
   }
 
-  const decrementItem = (item, e) => {
+  const decrement = (item: any, e: React.MouseEvent) => {
     e.stopPropagation()
-    const exists = selectedItems.find(i => i.id === item.id)
-    if (exists && exists.quantity > 1) {
-      setSelectedItems(selectedItems.map(i =>
-        i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i
-      ))
-    } else if (exists && exists.quantity === 1) {
-       removeItem(item.id, e)
-    }
+    setSelectedItems(prev => {
+      const exists = prev.find(i => i.id === item.id)
+      if (!exists) return prev
+      if (exists.quantity <= 1) return prev.filter(i => i.id !== item.id)
+      return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i)
+    })
   }
 
-  const removeItem = (itemId, e) => {
-    if (e) e.stopPropagation()
-    setSelectedItems(selectedItems.filter(i => i.id !== itemId))
-  }
+  const subtotal   = selectedItems.reduce((s, i) => s + i.price * i.quantity, 0)
+  const totalItems = selectedItems.reduce((s, i) => s + i.quantity, 0)
+  const tax        = (subtotal * TAX_RATE) / 100
+  const grandTotal = subtotal + tax
 
-  const getQuantity = (itemId) => selectedItems.find(i => i.id === itemId)?.quantity || 0
-
-  // Calculations
-  const subtotal = selectedItems.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0)
-  const totalItems = selectedItems.reduce((sum, item) => sum + (item.quantity || 1), 0)
-  const tax = ((subtotal * TAX_RATE) / 100)
-  const totalWithTax = subtotal + tax
-
-  // Save
   const handleSave = () => {
     setIsSaving(true)
-    const items = selectedItems.map(item => ({
-      menu_item_id: item.id,
-      quantity: item.quantity,
-      price: item.price,
-      total_price: item.quantity * item.price,
-    }))
-    
-    router.put(`/orders/${order.id}/update-items`, { items }, {
-      onSuccess: () => {
-        setIsSaving(false)
-        onOpenChange(false)
-        // router.reload({ only: ['orders'] }) is not strictly necessary if Inertia updates properties automatically, but good to keep state fresh.
+    router.put(
+      `/orders/${order.id}/update-items`,
+      {
+        items: selectedItems.map(i => ({
+          menu_item_id: i.id,
+          quantity:     i.quantity,
+          price:        i.price,
+          total_price:  i.quantity * i.price,
+        })),
       },
-      onError: () => {
-        setIsSaving(false)
+      {
+        onSuccess: () => { setIsSaving(false); onOpenChange(false) },
+        onError:   () => setIsSaving(false),
       }
-    })
+    )
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] w-full md:max-w-4xl lg:max-w-5xl h-[90vh] md:h-[85vh] p-0 flex flex-col overflow-hidden bg-gray-50/50 dark:bg-neutral-900 glass-panel border border-white/20 shadow-2xl rounded-2xl">
-        <DialogHeader className="p-5 border-b bg-white dark:bg-neutral-900 z-10">
-          <DialogTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <div className="bg-red-100 p-2 rounded-xl dark:bg-red-900/30">
-                <ShoppingCart className="w-5 h-5 text-red-600 dark:text-red-400" />
-              </div>
-              <div className="flex flex-col items-start">
-                  <span className="text-xl font-bold">Update Order #{order?.order_number}</span>
-                  <DialogDescription className="text-xs">Add or modify items in this order.</DialogDescription>
-              </div>
+      <DialogContent className="flex flex-col gap-0 overflow-hidden p-0 w-[96vw] max-w-5xl h-[92vh] sm:h-[88vh] rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl border-0">
+
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 bg-linear-to-r from-red-600 to-orange-500 px-5 py-4 text-white shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
+              <ShoppingCart className="h-5 w-5" />
             </div>
-            
-            {/* Search */}
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Search menu items..."
+            <div className="min-w-0">
+              <h2 className="text-base font-bold leading-tight">Update Order #{order?.order_number}</h2>
+              <DialogDescription className="text-xs text-white/80 mt-0.5">
+                Add or remove items from this order
+              </DialogDescription>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Desktop search */}
+            <div className="relative hidden sm:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/60" />
+              <input
+                placeholder="Search items…"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="pl-9 bg-gray-50 border-gray-200 dark:bg-neutral-800 dark:border-neutral-700 rounded-full h-10 focus-visible:ring-offset-0 focus-visible:ring-red-500 transition-all"
+                className="h-9 w-52 rounded-lg bg-white/20 pl-8 pr-3 text-sm text-white placeholder:text-white/60 outline-none focus:bg-white/30 transition-colors"
               />
             </div>
-          </DialogTitle>
-        </DialogHeader>
-
-        {/* Categories Tab */}
-        <div className="flex flex-wrap items-center gap-2 py-3 px-5 border-b bg-white dark:bg-neutral-900/90 sticky top-0 z-10">
-          <ScrollArea className="w-full whitespace-nowrap" orientation="horizontal">
-            <div className="flex w-max space-x-2 p-1">
-                <Button
-                    variant={selectedCategory === 'all' ? "default" : "outline"}
-                    className={`rounded-full shadow-none ${selectedCategory === 'all' ? 'bg-red-600 hover:bg-red-700' : 'text-gray-600 dark:text-gray-300'}`}
-                    onClick={() => setSelectedCategory('all')}
-                    size="sm"
-                >
-                    All Items
-                </Button>
-                {categories.map(c => (
-                <Button
-                    key={c.id}
-                    variant={selectedCategory === String(c.id) ? "default" : "outline"}
-                    className={`rounded-full shadow-none ${selectedCategory === String(c.id) ? 'bg-red-600 hover:bg-red-700' : 'text-gray-600 dark:text-gray-300'}`}
-                    onClick={() => setSelectedCategory(String(c.id))}
-                    size="sm"
-                >
-                    {c.name}
-                </Button>
-                ))}
-            </div>
-          </ScrollArea>
+            {/* X Close button */}
+            <button
+              onClick={() => onOpenChange(false)}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 transition-colors"
+              aria-label="Close modal"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
-        {/* Content Area */}
-        <ScrollArea className="flex-1 bg-gray-50 dark:bg-neutral-900/50 p-4 md:p-6">
-          {loading ? (
-            <div className="flex flex-col items-center justify-center h-full space-y-4 py-20">
-              <div className="w-10 h-10 border-4 border-red-200 border-t-red-600 rounded-full animate-spin"></div>
-              <p className="text-gray-500 font-medium animate-pulse">Loading menu items...</p>
-            </div>
-          ) : (
-            <>
-              {filteredMenuItems.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <div className="bg-gray-200/50 dark:bg-neutral-800/50 p-4 rounded-full mb-4">
-                        <Search className="w-8 h-8 text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">No items found</h3>
-                    <p className="text-gray-500 max-w-sm mt-1">We couldn't find anything matching your search. Try adjusting the category or search term.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
-                  {filteredMenuItems.map(item => {
-                    const qty = getQuantity(item.id)
-                    const isSelected = qty > 0
+        {/* Mobile search */}
+        <div className="relative block sm:hidden shrink-0 border-b border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 py-2">
+          <Search className="absolute left-7 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+          <Input
+            placeholder="Search menu items…"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="pl-8 h-9 bg-gray-50 dark:bg-neutral-800"
+          />
+        </div>
 
-                    return (
-                      <Card 
-                        key={item.id} 
-                        onClick={() => addItem(item)}
-                        className={`overflow-hidden cursor-pointer group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
-                            ${isSelected 
-                                ? 'ring-2 ring-red-500 border-red-200 shadow-md shadow-red-100 dark:shadow-red-900/20 dark:border-red-800' 
-                                : 'border-gray-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-neutral-600 shadow-sm'
-                            }
-                        `}
-                      >
-                        <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-neutral-800">
-                          {isSelected && (
-                              <div className="absolute inset-0 bg-red-600/10 z-10 transition-opacity"></div>
-                          )}
-                          <img
-                            src={item.image ? `/assets/images/menuitems/${item.image}` : '/assets/images/menuitems/food-default.png'}
-                            alt={item.name}
-                            className={`w-full h-full object-cover transition-transform duration-500 ${isSelected ? 'scale-105' : 'group-hover:scale-110'}`}
-                            onError={e => { e.target.src = '/assets/images/menuitems/food-default.png' }}
-                          />
-                          
-                          {/* Quantity Controls Overlay when Selected */}
-                          {isSelected ? (
-                             <div className="absolute inset-x-0 bottom-0 top-0 bg-gradient-to-t from-red-900/80 via-transparent to-transparent z-20 flex flex-col justify-end p-2 pb-3">
-                                <div className="flex items-center justify-between bg-white dark:bg-neutral-800 rounded-full shadow-lg p-1 border border-red-100 dark:border-neutral-700 animate-in fade-in slide-in-from-bottom-2">
-                                    <button 
-                                        onClick={(e) => decrementItem(item, e)}
-                                        className="w-8 h-8 rounded-full bg-red-50 dark:bg-neutral-700 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-neutral-600 flex items-center justify-center transition-colors"
-                                    >
-                                        {qty === 1 ? <X className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
-                                    </button>
-                                    <span className="font-bold text-gray-900 dark:text-white px-2">{qty}</span>
-                                    <button 
-                                        onClick={(e) => { e.stopPropagation(); addItem(item); }}
-                                        className="w-8 h-8 rounded-full bg-red-600 text-white hover:bg-red-700 flex items-center justify-center shadow-sm transition-colors"
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                    </button>
-                                </div>
-                             </div>
-                          ) : (
-                             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 translate-y-2 group-hover:translate-y-0 duration-300">
-                                 <div className="w-8 h-8 rounded-full bg-white/90 backdrop-blur text-gray-800 shadow-md flex items-center justify-center">
-                                     <Plus className="w-5 h-5 text-red-600" />
-                                 </div>
-                             </div>
-                          )}
-                        </div>
-                        <CardContent className="p-3">
-                          <div className="flex flex-col justify-between h-full space-y-1">
-                            <h4 className="font-semibold text-sm line-clamp-2 leading-tight text-gray-800 dark:text-gray-200" title={item.name}>
-                                {item.name}
-                            </h4>
-                            <div className="flex items-center text-red-600 dark:text-red-400 font-bold text-sm tracking-tight mt-auto">
-                                <IndianRupee className="w-3.5 h-3.5 mr-[1px]" />
-                                {Number(item.price).toFixed(2)}
+        {/* Category tabs */}
+        <div className="shrink-0 border-b border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 py-2">
+          <div className="overflow-x-auto scrollbar-none">
+            <div className="flex w-max gap-2 pb-1">
+              {[{ id: 'all', name: 'All Items' }, ...categories].map((c: any) => {
+                const active = selectedCategory === String(c.id)
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setSelectedCategory(String(c.id))}
+                    className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+                      active
+                        ? 'bg-red-600 text-white shadow-sm'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'
+                    }`}
+                  >
+                    {c.name}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Item grid */}
+        <ScrollArea className="flex-1 bg-gray-50 dark:bg-neutral-950/50">
+          <div className="p-4">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-24 gap-3">
+                <div className="h-10 w-10 rounded-full border-4 border-red-200 border-t-red-600 animate-spin" />
+                <p className="text-sm text-gray-500 animate-pulse">Loading menu items…</p>
+              </div>
+            ) : filteredItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-24 text-center">
+                <div className="mb-4 rounded-full bg-gray-200 dark:bg-neutral-800 p-4">
+                  <Search className="h-8 w-8 text-gray-400" />
+                </div>
+                <p className="text-base font-semibold text-gray-900 dark:text-white">No items found</p>
+                <p className="mt-1 text-sm text-gray-500 max-w-xs">Try changing the category or search term.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {filteredItems.map((item: any) => {
+                  const qty        = getQty(item.id)
+                  const isSelected = qty > 0
+
+                  return (
+                    <Card
+                      key={item.id}
+                      onClick={() => addItem(item)}
+                      className={`group cursor-pointer overflow-hidden border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+                        isSelected
+                          ? 'border-red-400 ring-2 ring-red-400/30 shadow-md dark:border-red-600'
+                          : 'border-gray-200 dark:border-neutral-800 hover:border-red-300'
+                      }`}
+                    >
+                      <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-neutral-800">
+                        <img
+                          src={item.image ? `/assets/images/menuitems/${item.image}` : '/assets/images/menuitems/food-default.png'}
+                          alt={item.name}
+                          className={`h-full w-full object-cover transition-transform duration-500 ${isSelected ? 'scale-105' : 'group-hover:scale-110'}`}
+                          onError={(e: any) => { e.target.src = '/assets/images/menuitems/food-default.png' }}
+                        />
+
+                        {isSelected ? (
+                          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-2">
+                            <div className="flex items-center justify-between rounded-full bg-white dark:bg-neutral-800 px-1 py-0.5 shadow">
+                              <button
+                                onClick={(e) => decrement(item, e)}
+                                className="flex h-7 w-7 items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-600 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-red-400 transition-colors"
+                              >
+                                {qty === 1 ? <X className="h-3.5 w-3.5" /> : <Minus className="h-3.5 w-3.5" />}
+                              </button>
+                              <span className="text-sm font-bold text-gray-900 dark:text-white w-6 text-center">{qty}</span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); addItem(item) }}
+                                className="flex h-7 w-7 items-center justify-center rounded-full bg-red-600 hover:bg-red-700 text-white shadow transition-colors"
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                              </button>
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    )
-                  })}
-                </div>
-              )}
-            </>
-          )}
+                        ) : (
+                          <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/90 shadow-md">
+                              <Plus className="h-4 w-4 text-red-600" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <CardContent className="p-2.5">
+                        <p className="line-clamp-2 text-xs font-semibold leading-tight text-gray-800 dark:text-gray-200" title={item.name}>
+                          {item.name}
+                        </p>
+                        <div className="mt-1 flex items-center text-xs font-bold text-red-600 dark:text-red-400">
+                          <IndianRupee className="h-3 w-3 mr-0.5" />
+                          {Number(item.price).toFixed(2)}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         </ScrollArea>
 
-        {/* Bottom Cart Summary */}
-        <div className="border-t bg-white dark:bg-neutral-900 p-4 md:px-6 z-20 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 flex-1">
+        {/* Footer */}
+        <div className="shrink-0 border-t border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 py-3 sm:px-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
               <div className="flex items-center gap-2">
-                <div className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg">
-                    {totalItems}
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 font-bold text-sm">
+                  {totalItems}
                 </div>
-                <div className="flex flex-col">
-                    <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Cart</span>
-                    <span className="text-sm font-semibold">{totalItems === 1 ? 'Item' : 'Items'}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-neutral-300">
+                  {totalItems === 1 ? 'item' : 'items'}
+                </span>
+              </div>
+
+              <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-neutral-700" />
+
+              <div className="flex gap-4 text-sm">
+                <div>
+                  <span className="text-gray-500">Subtotal </span>
+                  <span className="font-semibold text-gray-800 dark:text-neutral-200">₹{subtotal.toFixed(2)}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Tax ({TAX_RATE}%) </span>
+                  <span className="font-semibold text-green-600">₹{tax.toFixed(2)}</span>
                 </div>
               </div>
 
-              <div className="hidden sm:block w-px h-8 bg-gray-200 dark:bg-neutral-800"></div>
+              <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-neutral-700" />
 
-              <div className="flex flex-col">
-                    <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Subtotal</span>
-                    <span className="text-sm font-semibold flex items-center text-gray-700 dark:text-gray-300">
-                        ₹{subtotal.toFixed(2)}
-                    </span>
-              </div>
-
-              <div className="flex flex-col">
-                    <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">+ Tax (~{TAX_RATE}%)</span>
-                    <span className="text-sm font-semibold flex items-center text-green-600 dark:text-green-500">
-                        ₹{tax.toFixed(2)}
-                    </span>
-              </div>
-
-              <div className="flex flex-col ml-auto sm:ml-0 md:ml-auto">
-                    <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Total</span>
-                    <span className="text-xl font-black text-red-600 dark:text-red-400 tracking-tight">
-                        ₹{totalWithTax.toFixed(2)}
-                    </span>
-              </div>
+              <div className="text-xl font-black text-red-600 dark:text-red-400">₹{grandTotal.toFixed(2)}</div>
             </div>
 
-            <div className="flex flex-row items-center justify-end gap-3 sm:w-auto w-full">
-              <Button 
-                variant="outline" 
+            <div className="flex items-center gap-2 sm:shrink-0">
+              <Button
+                variant="outline" size="sm"
                 onClick={() => setSelectedItems([])}
                 disabled={selectedItems.length === 0 || isSaving}
-                className="rounded-full flex-1 sm:flex-none"
+                className="rounded-full"
               >
                 Clear
               </Button>
-              <Button 
-                onClick={handleSave} 
-                className="bg-red-600 hover:bg-red-700 text-white rounded-full px-6 flex-1 sm:flex-none shadow-md shadow-red-200 dark:shadow-none"
+              <Button
+                size="sm"
+                onClick={handleSave}
                 disabled={selectedItems.length === 0 || isSaving}
+                className="rounded-full bg-red-600 hover:bg-red-700 text-white px-6 shadow-md shadow-red-200 dark:shadow-none"
               >
-                {isSaving ? "Updating..." : "Update Order"}
+                {isSaving ? 'Updating…' : 'Update Order'}
               </Button>
             </div>
           </div>
@@ -326,4 +313,5 @@ const AddItemsModal = ({ open, onOpenChange, order }) => {
     </Dialog>
   )
 }
+
 export default AddItemsModal

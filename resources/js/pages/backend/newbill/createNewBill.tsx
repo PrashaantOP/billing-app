@@ -1,10 +1,10 @@
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import {  useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Search, X } from 'lucide-react';
 
 import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
-// import SettingsLayout from '@/layouts/settings/layout';
 import NewBillLayout from '@/layouts/newBill/layout';
 import NewMenuItem from '../menuItems/addMenuItems';
 import FloatingCartToggle from './components/FloatingCartToggle';
@@ -38,27 +38,20 @@ type MenuItemType = {
     quantity?: number; // Added optional quantity property
 }
 
-type CreateNewBillProps = {
-    categories: {
-        id: number;
-        name: string;
-        slug: string;
-    }[];
-    menuitems: {
-        id: number;
-        name: string;
-        image: string;
-        price: number;
-        is_available: boolean;
+type MenuItemProp = {
+    id: number;
+    name: string;
+    image: string;
+    price: number;
+    is_available: boolean;
+};
 
-    }[];
+type CreateNewBillProps = {
+    categories: { id: number; name: string; slug: string }[];
+    menuitems: MenuItemProp[];
+    allmenuitems: MenuItemProp[];
     categoryname: string;
-    taxes: {
-        id: number;
-        name: string;
-        rate: number;
-        rate_type: string;
-    }[];
+    taxes: { id: number; name: string; rate: number; rate_type: 'percent' | 'fixed' }[];
 }
 
 type Bill = {
@@ -84,7 +77,7 @@ type Bill = {
 };
 
 
-export default function CreateNewBill({ categories, menuitems, categoryname, taxes }: CreateNewBillProps) {
+export default function CreateNewBill({ categories, menuitems, allmenuitems, categoryname, taxes }: CreateNewBillProps) {
 
 
 // right side cart work starts here
@@ -96,14 +89,15 @@ const [cartOpen, setCartOpen] = useState(false);
 const [isPaid, setIsPaid] = useState(false);
 const [paymentMethod, setPaymentMethod] = useState('');
 const [transactionId, setTransactionId] = useState('');
-const [isReceived, setIsReceived] = useState(false);
-
 const [isSaving, setIsSaving] = useState(false); //order confirm
 
 //discount
 const [applyDiscount, setApplyDiscount] = useState(false);
-const [discountType, setDiscountType] = useState('percent');
+const [discountType, setDiscountType] = useState<'percent' | 'fixed'>('percent');
 const [discountValue, setDiscountValue] = useState('');
+
+// Search
+const [searchTerm, setSearchTerm] = useState('');
 
 // Tabs / Bills
 const [bills, setBills] = useState<Bill[]>([]);
@@ -181,7 +175,7 @@ const handleSelect = (item: MenuItemType) => {
       const exists = bill.items.find(i => i.id === item.id);
       const updatedItems = exists
         ? bill.items.map(i =>
-            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+            i.id === item.id ? { ...i, quantity: (i.quantity ?? 0) + 1 } : i
           )
         : [...bill.items, { ...item, quantity: 1 }];
 
@@ -418,9 +412,6 @@ useEffect(() => {
     setTransactionId('');
   }
 
-  // 🔄 Sync Received checkbox (if used)
-  setIsReceived(!!bill?.received);
-
 }, [activeBillId, bills]);
 
 // ==========================
@@ -457,7 +448,7 @@ const discountedTotal = Math.max(subtotal - discountAmount, 0);
 
 //  Tax Calculation
 const totalTax = taxes.reduce((sum, tax) => {
-  const rate = parseFloat(tax.rate);
+  const rate = Number(tax.rate);
   return sum + (tax.rate_type === 'percent'
     ? (discountedTotal * rate) / 100
     : rate);
@@ -584,13 +575,40 @@ const handleSaveOrder = () => {
 
                 {/* new tab end  */}
                 <div className="flex flex-row items-center justify-start gap-2 ">
-                <div className="space-y-6">
-                    <HeadingSmall title={categoryname} description="Create new order and print" />
-                    <div><NewMenuItem categories={categories} varient='link' size='nopd' /></div>
+                <div className="space-y-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <HeadingSmall title={categoryname} description="Create new order and print" />
+                        <div><NewMenuItem categories={categories} varient='link' size='nopd' /></div>
+                    </div>
+
+                    {/* Search bar */}
+                    <div className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-900">
+                        <Search className="h-4 w-4 shrink-0 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search all items..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            className="w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none dark:text-neutral-200"
+                        />
+                        {searchTerm && (
+                            <button onClick={() => setSearchTerm('')} className="text-gray-400 hover:text-gray-600 dark:hover:text-neutral-200">
+                                <X className="h-3.5 w-3.5" />
+                            </button>
+                        )}
+                    </div>
+                    {searchTerm && (
+                        <p className="text-xs text-gray-400 dark:text-neutral-500">
+                            Searching across all categories — {allmenuitems.filter(i => i.name.toLowerCase().includes(searchTerm.toLowerCase())).length} result(s)
+                        </p>
+                    )}
 
                     {/* here is new compo  */}
                     <MenuItemGrid
-                        items={menuitems}
+                        items={(searchTerm
+                            ? allmenuitems.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                            : menuitems
+                        )}
                         selectedItems={selectedItems}
                         activeBillItems={activeBill?.items || []}
                         handleSelect={handleSelect}

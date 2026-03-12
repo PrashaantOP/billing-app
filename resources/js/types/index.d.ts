@@ -34,6 +34,7 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    subscription: { plan_name: string; status: string; is_pro: boolean };
     [key: string]: unknown;
 }
 
